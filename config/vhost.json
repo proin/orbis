@@ -1,0 +1,13 @@
+{
+	"8080" : {
+		"127.0.0.1" : {
+			"description" : "Develop UrMate Core Engine",
+			"dir" : "/Users/proin/Dropbox/workspace/nodejs/server/test",
+			"api-ext" : ".api",
+			"api-doc" : "/api.doc",
+			"doc-index" : [
+				"index.html"
+			]
+		}
+	}
+}

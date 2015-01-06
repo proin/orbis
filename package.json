@@ -1,0 +1,16 @@
+{
+	"name": "node-server",
+	"description": "",
+	"author": {
+		"name": "",
+		"email": ""
+	},
+	"version": "0.0.1",
+	"private": true,
+	"dependencies": {
+		"mime": ">= 1.2.11",
+		"mongodb": ">= 1.4.12",
+		"mysql": ">= 2.5.2",
+		"node-uuid": ">= 1.4.1"
+	}
+}
