@@ -10,6 +10,8 @@ exports.filter = function(global, request, response, user) {
 	if(type == 'application/octet-stream') {
 		type = 'text/html';
 		var docIndexs = global.vhost[global.port][global.host]['doc-index'];
+		if(docIndexs == null) 
+			docIndexs = ['index.html', 'index.htm', 'index.php', 'index.jsp'];
 		for(var i = 0; i < docIndexs.length ; i++) {
 			if(require('path').existsSync(path + '/' + docIndexs[i])) {
 				path = path + '/' + docIndexs[i];
