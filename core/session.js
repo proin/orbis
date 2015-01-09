@@ -17,10 +17,7 @@ exports.start = function(global, request, response, callback) {
 
 	var fs = require('fs');
 	var uuid = cookies.uuid;
-	uuid = exports.createUUID(global, response, hostname, uuid);
-
-	var sessionFilePath = './session/_' + hostname + '/' + uuid + '.json';
-	var session = JSON.parse(fs.readFileSync(sessionFilePath));
+	var session = exports.checkUUID(global, response, hostname, uuid);
 
 	session.edit = function(key, val) {
 		if(key == 'hostname' || key == 'uuid') return session;
@@ -42,21 +39,40 @@ exports.start = function(global, request, response, callback) {
 	callback(session);
 }
 
-exports.createUUID = function(global, response, hostname, preUUID) {
+exports.checkUUID = function(global, response, hostname, preUUID) {
 	var fs = require('fs');
+
 	var hostHome = './session/_' + hostname;
 	if(require('path').existsSync(hostHome) == false)
 		fs.mkdirSync(hostHome);
+
+	var sessionInfo = {};
+
+	if(preUUID != null && require('path').existsSync(hostHome + '/' + preUUID + '.json')) {
+		sessionInfo = JSON.parse(fs.readFileSync(hostHome + '/' + preUUID + '.json'));
+
+		var sessionExpire = global.vhost[global.port][global.host]['session-expire'];
+		if(sessionExpire == null)
+			sessionExpire = 3;
+		sessionExpire = sessionExpire * 1;
+
+		var sessionDate = new Date(sessionInfo.date);
+		var now = new Date();
+		var diff = now - sessionDate;
+
+		if(diff < 1000 * 60 * 60 * 24 * sessionExpire) {
+			sessionInfo.date = new Date().toString();
+			fs.writeFileSync(hostHome + '/' + preUUID + '.json', JSON.stringify(sessionInfo));
+			return JSON.parse(fs.readFileSync(hostHome + '/' + preUUID + '.json'));	
+		} else {
+			fs.unlinkSync(hostHome + '/' + preUUID + '.json', JSON.stringify(sessionInfo));
+		}
+	}
 
 	var uuid = require('node-uuid').v4();
 	while(require('path').existsSync(hostHome + '/' + uuid + '.json') == true)
 		uuid = require('node-uuid').v4();
 
-	var sessionInfo = {}
-	if(preUUID != null && require('path').existsSync( hostHome + '/' + preUUID + '.json' )) {
-		sessionInfo = JSON.parse(fs.readFileSync( hostHome + '/' + preUUID + '.json' ));
-		fs.unlinkSync(hostHome + '/' + preUUID + '.json');
-	}
 	sessionInfo.uuid = uuid;
 	sessionInfo.host = hostname;
 	sessionInfo.date = new Date().toString();
@@ -64,5 +80,5 @@ exports.createUUID = function(global, response, hostname, preUUID) {
 	fs.writeFileSync( hostHome + '/' + uuid + '.json' , JSON.stringify( sessionInfo ) );
 
 	response.setHeader("Set-Cookie", ['uuid=' + uuid + '; Domain=' + hostname + '; Path=/']);
-	return uuid;
+	return sessionInfo;
 }

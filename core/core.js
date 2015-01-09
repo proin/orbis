@@ -9,11 +9,11 @@ exports.start = function() {
 			}
 		},
 		module : {
+			session : require('./session.js'),
 			filter : {
-				session : require('./filter/session.js'),
-				api : require('./filter/loadAPI.js'),
-				apiDoc : require('./filter/apiDoc.js'),
-				stream : require('./filter/loadStream.js')
+				api : require('./filter/api.js'),
+				apiDoc : require('./filter/apidoc.js'),
+				stream : require('./filter/stream.js')
 			},
 			database : require('./database/controller.js')
 		}

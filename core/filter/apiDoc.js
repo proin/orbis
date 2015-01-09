@@ -1,4 +1,4 @@
-exports.start = function(global, request, response, session) {
+exports.filter = function(global, request, response, session) {
 
 	var fs = require('fs');
 	var explorer = function(dir, done) {

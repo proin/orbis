@@ -2,6 +2,7 @@ exports.start = function(global) {
 	var filter = require('./filter.js');
 
 	var server = require('http').createServer(function(request, response) {
+		process.setMaxListeners(0);
 		process.on('uncaughtException', function (err) {
 			try {
 				response.writeHead(404, {'Content-Type' : 'text/json'});

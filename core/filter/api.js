@@ -1,4 +1,4 @@
-exports.start = function(global, request, response, session) {
+exports.filter = function(global, request, response, session) {
 	var path = global.path;
 	delete require.cache[global.vhost[global.port][global.host]['dir'] + path];
 	var apiModule = require(global.vhost[global.port][global.host]['dir'] + path);

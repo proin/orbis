@@ -1,4 +1,4 @@
-exports.start = function(global, request, response, user) {
+exports.filter = function(global, request, response, user) {
 	var path = global.path;
 	
 	path = global.vhost[global.port][global.host]['dir'] + path;
