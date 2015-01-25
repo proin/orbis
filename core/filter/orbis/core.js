@@ -15,7 +15,8 @@ exports.orbisApi = function(global, request, response, session, data, callback) 
     var orbis = {
         api: require(global.homeDir + "/filter/orbis/role/api.js"),
         auth: require(global.homeDir + "/filter/orbis/role/auth.js"),
-        template: require(global.homeDir + "/filter/orbis/role/template.js")
+        template: require(global.homeDir + "/filter/orbis/role/template.js"),
+        query: require(global.homeDir + "/filter/orbis/role/query.js")
     }
 
     var fs = require('fs');
@@ -85,6 +86,12 @@ exports.roleIterator = function(global, request, response, session, orbis, windo
                     callback(result);
                 });
                 return;
+
+                case 'query':
+                var replaceString = '<script type="text/javascript">var ' + $('[orbis-id="' + keys[idx] + '"]').attr('valName') + ' = ' + JSON.stringify(data.print) + '</script>';
+                $('[orbis-id="' + keys[idx] + '"]').replaceWith(replaceString);
+                exports.roleIterator(global, request, response, session, orbis, window, keys, idx + 1, callback);
+                break;
             }
         });
     } else {
