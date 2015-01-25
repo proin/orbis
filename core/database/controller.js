@@ -1,6 +1,7 @@
 exports.connect = function(config, callback) {
 	if(config == null || config.type == null) {
 		callback(true, null);
+		return;
 	}
 
 	switch(config.type) {
@@ -9,7 +10,7 @@ exports.connect = function(config, callback) {
 			client.connect("mongodb://" + config.host + ":"+ config.port + "/" + config.database , function(err, db) {
 				callback(err, db);
 			});
-			return;
+			break;
 		case 'mysql' : 
 			var connection = require('mysql').createConnection({
 				host : config.host,
@@ -22,6 +23,6 @@ exports.connect = function(config, callback) {
 			connection.connect(function(err) {
 				callback(err, connection);
 			});
-			return;
+			break;
 	}
 }

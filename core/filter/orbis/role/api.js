@@ -102,8 +102,9 @@ exports.parse = function(global, request, response, session, window, keys, idx, 
 			apiModule.result(
 				function(body, callbackDB) {
 					try {
-						if(callbackDB != null) callbackDB.close();
+						if(callbackDB != null && callbackDB.close != null) callbackDB.close();
 					} catch(e) {
+						console.log(e + '');
 					}
 					callback('api', { print : body });
 				},

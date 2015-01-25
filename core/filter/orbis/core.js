@@ -5,10 +5,10 @@ exports.filter = function (global, request, response, session) {
     data = fs.readFileSync(path);
 
     exports.orbisApi(global, request, response, session, data, function(result) {
+        var print = '<html>\n' + result + '\n</html>';
         response.writeHead(200, {'Content-Type': 'text/html'});
-        response.end('<html>\n' + result + '\n</html>');
-    });
-    
+        response.end(print);
+    });    
 }
 
 exports.orbisApi = function(global, request, response, session, data, callback) {
@@ -69,7 +69,7 @@ exports.roleIterator = function(global, request, response, session, orbis, windo
 
                 case 'auth':
                 if(data.allow == false) {
-                    $('body').replaceWith(data.print);
+                    $('body').html(data.print);
                     callback($('html').html());
                     return;
                 } else {
@@ -80,10 +80,11 @@ exports.roleIterator = function(global, request, response, session, orbis, windo
 
                 case 'template':
                 $('[orbis-id="' + keys[idx] + '"]').replaceWith(data.data);
-                exports.orbisApi(global, request, response, session, $('html').html(), function(result) {
+                var html = '<html>' + $('html').html() + '</html>';
+                exports.orbisApi(global, request, response, session, html, function(result) {
                     callback(result);
                 });
-                break;
+                return;
             }
         });
     } else {
