@@ -1,16 +1,17 @@
 {
-	"name": "node-server",
-	"description": "",
-	"author": {
-		"name": "",
-		"email": ""
-	},
-	"version": "0.0.1",
-	"private": true,
-	"dependencies": {
-		"mime": ">= 1.2.11",
-		"mongodb": ">= 1.4.12",
-		"mysql": ">= 2.5.2",
-		"node-uuid": ">= 1.4.1"
-	}
+  "name": "orbis",
+  "description": "Node.js Web Engine",
+  "author": {
+    "name": "Chae Yeonghun",
+    "email": "proin@proinlab.com"
+  },
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "mime": ">= 1.2.11",
+    "mongodb": ">= 1.4.12",
+    "mysql": ">= 2.5.2",
+    "node-uuid": ">= 1.4.1",
+    "jsdom": ">= 2.0.0"
+  }
 }

@@ -18,7 +18,8 @@ exports.filter = function(global, request, response, session) {
 	}
 
 	if(paramsRequirement == false) {
-		response.end(JSON.stringify({ code : 400 , data : 'not enough query' }));
+		response.writeHead(200, { 'Content-Type': 'text/json; charset=UTF-8' });
+		response.end(JSON.stringify({ code : 400 , data : 'not enough query' }), 'UTF-8');
 		return;
 	}
 
@@ -39,10 +40,10 @@ exports.filter = function(global, request, response, session) {
 
 		if(queryOption == true) {
 			apiModule.result(
-				function(body) {
+				function(body, callbackDB) {
 					response.writeHead(200, { 'Content-Type': 'text/json; charset=UTF-8' });
 					response.end(JSON.stringify(body), 'UTF-8');
-					db.close();
+					if(callbackDB != null) callbackDB.close();
 				},
 				global.query, db, session
 				);
@@ -50,8 +51,8 @@ exports.filter = function(global, request, response, session) {
 			var body = {};
 			body.code = 404;
 			body.data = 'Page Not Found';
-			response.end(JSON.stringify(body));
-			db.close();
+			response.writeHead(200, { 'Content-Type': 'text/json; charset=UTF-8' });
+			response.end(JSON.stringify(body), 'UTF-8');
 		}
 	});
 }

@@ -17,10 +17,9 @@ exports.filter = function(global, request, response, session) {
 							next();
 						});
 					} else {
-						var apiExt = global.vhost[global.port][global.host]['api-ext'].replace('.', '');
-						var pathSplit = file.split('.');
-						if( pathSplit.length > 1 && apiExt == pathSplit[pathSplit.length - 1] ) {
-							results.push(file);	
+						var apiExt = global.vhost[global.port][global.host]['api-ext'];
+						if(file.indexOf(apiExt, file.length - apiExt.length) !== -1 ) {
+							results.push(file);
 						}
 						next();
 					}
@@ -60,9 +59,6 @@ exports.filter = function(global, request, response, session) {
 
 		}
 	});
-
-
-	
 	
 }
 

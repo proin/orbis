@@ -1,4 +1,8 @@
 exports.connect = function(config, callback) {
+	if(config == null || config.type == null) {
+		callback(true, null);
+	}
+
 	switch(config.type) {
 		case 'mongodb' : 
 			var client = require('mongodb').MongoClient;
