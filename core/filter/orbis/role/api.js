@@ -1,6 +1,5 @@
-exports.parse = function(global, request, response, session, window, keys, idx, callback) {
-	var $ = window.$;
-	var src = $('[orbis-id="' + keys[idx] + '"]').attr('src');
+exports.parse = function(global, request, response, session, object, callback) {
+	var src = object.attr('src');
 	var url = require('url').parse(src);
 
 	var apiPath = '';
@@ -49,7 +48,7 @@ exports.parse = function(global, request, response, session, window, keys, idx, 
 	}
 
 	if(require('path').existsSync(apiPath) == false) {
-		callback('api', { print : '' });
+		callback('api', { print : { code : 404 , data : 'Not Found' } });
 		return;
 	}
 
@@ -78,39 +77,43 @@ exports.parse = function(global, request, response, session, window, keys, idx, 
 		}
 	}
 
+	var queryOption = false;
+	if(apiModule.method == 'GET') {
+		if(request.method == 'GET')
+		queryOption = true;
+	}
+
+	if(apiModule.method == 'POST') {
+		if(request.method == 'POST')
+		queryOption = true;
+	}
+
+	if(apiModule.method == 'AUTO') {
+		queryOption = true;
+	}
+
+	if(queryOption == false) {
+		callback('api', { print : { code : 404, data : 'Not Found' } });
+		return;
+	}
+
 	if(paramsRequirement == false) {
-		callback('api', { print : { code : 400 , data : 'not enough query' } });
+		callback('api', { print : { code : 400, data : 'Not Enough Query' } });
 		return;
 	}
 
 	global.module.database.connect(apiModule.db, function(err, db) {
-		var queryOption = false;
-		if(apiModule.method == 'GET') {
-			if(request.method == 'GET')
-			queryOption = true;
-		}
-
-		if(apiModule.method == 'POST') {
-			if(request.method == 'POST')
-			queryOption = true;
-		}
-
-		if(apiModule.method == 'AUTO')
-		queryOption = true;
-
-		if(queryOption == true) {
-			apiModule.result({
-				response: function(body) {
-					try {
-						if(db != null && db.close != null) db.close();
-					} catch(e) {
-					}
-					callback('api', { print : body });
-				},
-				query: global.query,
-				db: db,
-				session: session
-			});
-		}
+		apiModule.result({
+			response: function(code, body) {
+				try {
+					if(db != null && db.close != null) db.close();
+				} catch(e) {
+				}
+				callback('api', { print : { code : code, body : body } });
+			},
+			query: global.query,
+			db: db,
+			session: session
+		});
 	});
 }

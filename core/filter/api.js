@@ -1,5 +1,11 @@
-exports.filter = function(global, request, response, session) {
+exports.filter = function(global, request, response, session, callback) {
 	var path = global.path;
+
+	if(require('path').existsSync(global.vhost[global.port][global.host]['dir'] + path) == false) {
+		callback(404, 'Not Found');
+		return;
+	}
+
 	delete require.cache[global.vhost[global.port][global.host]['dir'] + path];
 	var apiModule = require(global.vhost[global.port][global.host]['dir'] + path);
 
@@ -17,44 +23,40 @@ exports.filter = function(global, request, response, session) {
 		}
 	}
 
+	var queryOption = false;
+	if(apiModule.method == 'GET') {
+		if(request.method == 'GET')
+		queryOption = true;
+	}
+
+	if(apiModule.method == 'POST') {
+		if(request.method == 'POST')
+		queryOption = true;
+	}
+
+	if(apiModule.method == 'AUTO')
+	queryOption = true;
+
+	if(queryOption == false) {
+		callback(404, 'Not Found');
+		return;
+	}
+
 	if(paramsRequirement == false) {
-		response.writeHead(200, { 'Content-Type': 'text/json; charset=UTF-8' });
-		response.end(JSON.stringify({ code : 400 , data : 'not enough query' }), 'UTF-8');
+		callback(400, 'Not Enough Query');
 		return;
 	}
 
 	global.module.database.connect(apiModule.db, function(err, db) {
-		var queryOption = false;
-		if(apiModule.method == 'GET') {
-			if(request.method == 'GET')
-			queryOption = true;
-		}
-
-		if(apiModule.method == 'POST') {
-			if(request.method == 'POST')
-			queryOption = true;
-		}
-
-		if(apiModule.method == 'AUTO')
-		queryOption = true;
-
-		if(queryOption == true) {
-			apiModule.result({
-				response: function(body) {
-					response.writeHead(200, { 'Content-Type': 'text/json; charset=UTF-8' });
-					response.end(JSON.stringify(body), 'UTF-8');
-					if(db != null && db.close != null) db.close();
-				},
-				query: global.query,
-				db: db,
-				session: session
-			});
-		} else {
-			var body = {};
-			body.code = 404;
-			body.data = 'Page Not Found';
-			response.writeHead(200, { 'Content-Type': 'text/json; charset=UTF-8' });
-			response.end(JSON.stringify(body), 'UTF-8');
-		}
+		apiModule.result({
+			response: function(code, body) {
+				callback(code, body);
+				if(db != null && db.close != null) db.close();
+			},
+			query: global.query,
+			db: db,
+			session: session
+		});
 	});
+
 }

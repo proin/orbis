@@ -1,8 +1,8 @@
-exports.parse = function(global, request, response, session, window, keys, idx, callback) {
-	var $ = window.$;
-	var allow = require('querystring').parse($('[orbis-id="' + keys[idx] + '"]').attr('allow'));
-	var deniedMsg = $('[orbis-id="' + keys[idx] + '"]').html();
-	
+exports.parse = function(global, request, response, session, object, callback) {
+	var allow = require('querystring').parse(object.attr('allow'));
+	var deniedMsg = object.find('deny').html();
+	var allowedMsg = object.find('allow').html();
+
 	var auth = false;
 
 	Object.keys(allow).forEach(function(key) {
@@ -19,9 +19,13 @@ exports.parse = function(global, request, response, session, window, keys, idx, 
 					auth = true;
 				}
 			}
-			
+
 		}
 	});
 
-	callback('auth', { allow : auth, print : deniedMsg });
+	if(auth) {
+		callback('auth', { allow : auth, print : allowedMsg });
+	} else {
+		callback('auth', { allow : auth, print : deniedMsg });
+	}
 }

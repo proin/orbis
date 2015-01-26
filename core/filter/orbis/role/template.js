@@ -1,13 +1,12 @@
-exports.parse = function(global, request, response, session, window, keys, idx, callback) {
-	var $ = window.$;
-	var src = $('[orbis-id="' + keys[idx] + '"]').attr('src');
+exports.parse = function(global, request, response, session, object, callback) {
+	var src = object.attr('src');
 	var url = require('url').parse(src);
 
 	var fs = require('fs');
 	var data = '';
 
 	if(url.host != null) {
-		data = fs.readFileSync(global.vhost[url.port][url.hostname]['dir'] + url.pathname);			
+		data = fs.readFileSync(global.vhost[url.port][url.hostname]['dir'] + url.pathname);
 	} else if(url.pathname != null) {
 		if( url.pathname.indexOf('/') == 0 ) {
 			if(require('path').existsSync(global.vhost[global.port][global.host]['dir'] + url.pathname)) {
@@ -30,22 +29,22 @@ exports.parse = function(global, request, response, session, window, keys, idx, 
 				}
 
 				if(targetArr[i] == '..') {
-					pre++; 
+					pre++;
 				}
 			}
 
 			var resultPath = global.vhost[global.port][global.host]['dir']+  '/';
 			for(var i=0;i<pathArr.length - pre;i++) {
 				if(pathArr[i].length > 0) {
-					resultPath += pathArr[i] + '/';	
+					resultPath += pathArr[i] + '/';
 				}
 			}
 			resultPath += targetFileName;
 
 			if(require('path').existsSync(resultPath)) {
-				data = fs.readFileSync(resultPath);	
+				data = fs.readFileSync(resultPath);
 			}
-		}		
+		}
 	}
 
 	callback('template', { data : data + '' });
