@@ -93,6 +93,13 @@ exports.orbisApi = function(global, request, response, session, data, callback) 
                       replaceString = JSON.stringify(data.print[queryKey]);
                     }
                   }
+                } else if(object.attr('type') == 'check' && object.attr('key') != null) {
+                  var queryKey = object.attr('key');
+                  if(data.print[queryKey] != null) {
+                    replaceString = object.find('exist').html();
+                  } else {
+                    replaceString = object.find('not-exist').html();
+                  }
                 }
               }
               object.replaceWith(replaceString);
