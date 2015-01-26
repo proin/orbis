@@ -27,26 +27,28 @@ exports.filter = function(global, request, response, session) {
 		var queryOption = false;
 		if(apiModule.method == 'GET') {
 			if(request.method == 'GET')
-				queryOption = true;
+			queryOption = true;
 		}
 
 		if(apiModule.method == 'POST') {
 			if(request.method == 'POST')
-				queryOption = true;
+			queryOption = true;
 		}
 
 		if(apiModule.method == 'AUTO')
-			queryOption = true;
+		queryOption = true;
 
 		if(queryOption == true) {
-			apiModule.result(
-				function(body, callbackDB) {
+			apiModule.result({
+				response: function(body) {
 					response.writeHead(200, { 'Content-Type': 'text/json; charset=UTF-8' });
 					response.end(JSON.stringify(body), 'UTF-8');
-					if(callbackDB != null) callbackDB.close();
+					if(db != null && db.close != null) db.close();
 				},
-				global.query, db, session
-				);
+				query: global.query,
+				db: db,
+				session: session
+			});
 		} else {
 			var body = {};
 			body.code = 404;

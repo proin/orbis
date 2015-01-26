@@ -29,14 +29,14 @@ exports.parse = function(global, request, response, session, window, keys, idx, 
 				}
 			}
 			if(targetArr[i] == '..') {
-				pre++; 
+				pre++;
 			}
 		}
 
 		var resultPath = global.vhost[global.port][global.host]['dir']+  '/';
 		for(var i=0;i<pathArr.length - pre;i++) {
 			if(pathArr[i].length > 0) {
-				resultPath += pathArr[i] + '/';	
+				resultPath += pathArr[i] + '/';
 			}
 		}
 		resultPath += targetFileName;
@@ -62,7 +62,7 @@ exports.parse = function(global, request, response, session, window, keys, idx, 
 	});
 
 	url.query = require('querystring').parse(url.query);
-	
+
 	Object.keys(global.query).forEach(function(key) {
 		if(url.query[key] == null) {
 			url.query[key] = global.query[key];
@@ -87,29 +87,30 @@ exports.parse = function(global, request, response, session, window, keys, idx, 
 		var queryOption = false;
 		if(apiModule.method == 'GET') {
 			if(request.method == 'GET')
-				queryOption = true;
+			queryOption = true;
 		}
 
 		if(apiModule.method == 'POST') {
 			if(request.method == 'POST')
-				queryOption = true;
+			queryOption = true;
 		}
 
 		if(apiModule.method == 'AUTO')
-			queryOption = true;
+		queryOption = true;
 
 		if(queryOption == true) {
-			apiModule.result(
-				function(body, callbackDB) {
+			apiModule.result({
+				response: function(body) {
 					try {
-						if(callbackDB != null && callbackDB.close != null) callbackDB.close();
+						if(db != null && db.close != null) db.close();
 					} catch(e) {
-						console.log(e + '');
 					}
 					callback('api', { print : body });
 				},
-				url.query, db, session
-				);
+				query: global.query,
+				db: db,
+				session: session
+			});
 		}
 	});
 }
