@@ -68,13 +68,13 @@ exports.orbisApi = function(global, request, response, session, data, callback) 
               var replaceString = '';
               if(object.attr('type') != null) {
                 if(object.attr('type') == 'javascript' && object.attr('key') == null) {
-                  var valName = 'orbisQueryResult';
+                  var valName = roleType;
                   if(object.attr('value') != null) {
                     valName = object.attr('value');
                   }
                   replaceString = '<script type="text/javascript">var ' + valName + ' = ' + JSON.stringify(data.print) + '</script>';
                 } else if(object.attr('type') == 'javascript' && object.attr('key') != null) {
-                  var valName = 'orbisQueryResult';
+                  var valName = roleType;
                   if(object.attr('value') != null) {
                     valName = object.attr('value');
                   }
