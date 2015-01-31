@@ -1,7 +1,7 @@
-exports.start = function (global, request, response, callback) {
+exports.start = function (server, callback) {
     var cookies = new Object();
 
-    var cookiesArr = request.headers.cookie;
+    var cookiesArr = server.request.headers.cookie;
     if (cookiesArr == null) cookiesArr = [];
     else cookiesArr = cookiesArr.split(';');
 
@@ -11,13 +11,12 @@ exports.start = function (global, request, response, callback) {
         cookies[key] = val;
     }
 
-    var hostname = global.vhost[global.port][global.host]['session-combine'];
-    if (hostname == null)
-        hostname = global.host;
+    var hostname = server.vhost.SESSION_WITH;
+    if (hostname == null) hostname = server.host;
 
     var fs = require('fs');
     var uuid = cookies.uuid;
-    var session = exports.checkUUID(global, response, hostname, uuid);
+    var session = exports.checkUUID(server, hostname, uuid);
 
     var sessionFilePath = './session/_' + hostname + '/' + uuid + ".json";
 
@@ -41,7 +40,7 @@ exports.start = function (global, request, response, callback) {
     callback(session);
 }
 
-exports.checkUUID = function (global, response, hostname, preUUID) {
+exports.checkUUID = function (server, hostname, preUUID) {
     var fs = require('fs');
 
     var hostHome = './session/_' + hostname;
@@ -53,24 +52,11 @@ exports.checkUUID = function (global, response, hostname, preUUID) {
     if (preUUID != null && require('path').existsSync(hostHome + '/' + preUUID + '.json')) {
         sessionInfo = JSON.parse(fs.readFileSync(hostHome + '/' + preUUID + '.json'));
 
-        var sessionExpire = global.vhost[global.port][global.host]['session-expire'];
-        if (sessionExpire == null)
-            sessionExpire = 1000 * 60 * 60 * 24 * 3;
-        sessionExpire = sessionExpire.replace('s', '*1000');
-        sessionExpire = sessionExpire.replace('m', '*60*1000');
-        sessionExpire = sessionExpire.replace('h', '*60*60*1000');
-        sessionExpire = sessionExpire.replace('d', '*24*60*60*1000');
-        sessionExpire = sessionExpire.replace('w', '*7*24*60*60*1000');
-        var tmp = sessionExpire.split('*');
-        sessionExpire = 1;
-        for (var i = 0; i < tmp.length; i++)
-            sessionExpire *= tmp[i];
-
         var sessionDate = new Date(sessionInfo.date);
         var now = new Date();
         var diff = now - sessionDate;
 
-        if (diff < sessionExpire) {
+        if (diff < server.vhost.SESSION_EXPIRE) {
             sessionInfo.date = new Date().toString();
             fs.writeFileSync(hostHome + '/' + preUUID + '.json', JSON.stringify(sessionInfo));
             return JSON.parse(fs.readFileSync(hostHome + '/' + preUUID + '.json'));
@@ -89,6 +75,6 @@ exports.checkUUID = function (global, response, hostname, preUUID) {
 
     fs.writeFileSync(hostHome + '/' + uuid + '.json', JSON.stringify(sessionInfo));
 
-    response.setHeader("Set-Cookie", ['uuid=' + uuid + '; Domain=' + hostname + '; Path=/']);
+    server.response.setHeader("Set-Cookie", ['uuid=' + uuid + '; Domain=' + hostname + '; Path=/']);
     return sessionInfo;
 }

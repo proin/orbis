@@ -1,31 +1,39 @@
-exports.parse = function(global, request, response, session, object, callback) {
-	var allow = require('querystring').parse(object.attr('allow'));
-	var deniedMsg = object.find('deny').html();
-	var allowedMsg = object.find('allow').html();
+exports.parse = function (server, session, object, callback) {
+    var re = /<orbis.*?allow="(.*?)".*?<\/?orbis>/gim;
+    var allow = re.exec(object);
+    if (allow == null) {
+        callback(true, '');
+        return;
+    }
+    allow = require('querystring').parse(allow[1]);
 
-	var auth = false;
+    re = /<deny.*?>(.*?)<\/?deny>/gim;
+    var deniedMsg = re.exec(object);
+    deniedMsg = deniedMsg == null ? '' : deniedMsg[1];
 
-	Object.keys(allow).forEach(function(key) {
-		if(session[key] != null) {
-			var allowed = [ allow[key] ];
-			if(allow[key].indexOf(',') != -1) {
-				allowed = allow[key].split(',');
-			}
+    re = /<allow.*?>(.*?)<\/?allow>/gim;
+    var allowedMsg = re.exec(object);
+    allowedMsg = allowedMsg == null ? '' : allowedMsg[1];
 
-			for(var i=0;i<allowed.length;i++) {
-				if(session[key] == allowed[i]) {
-					auth = true;
-				} else if(allowed[i].length == 0) {
-					auth = true;
-				}
-			}
+    var auth = false;
 
-		}
-	});
+    Object.keys(allow).forEach(function (key) {
+        if (session[key] != null) {
+            var allowed = [allow[key]];
+            if (allow[key].indexOf(',') != -1) {
+                allowed = allow[key].split(',');
+            }
 
-	if(auth) {
-		callback('auth', { allow : auth, print : allowedMsg });
-	} else {
-		callback('auth', { allow : auth, print : deniedMsg });
-	}
+            for (var i = 0; i < allowed.length; i++) {
+                if (session[key] == allowed[i]) {
+                    auth = true;
+                } else if (allowed[i].length == 0) {
+                    auth = true;
+                }
+            }
+
+        }
+    });
+
+    callback(auth, auth ? allowedMsg : deniedMsg);
 }

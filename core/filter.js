@@ -1,24 +1,35 @@
-exports.handle = function (global, request, response) {
-  global.module.session.start(
-    global,
-    request,
-    response,
-    function (session) {
-      var apiExt = global.vhost[global.port][global.host]['api-ext'];
-      var orbisExt = global.vhost[global.port][global.host]['orbis-ext'];
+exports.handle = function (server) {
+    if (server.vhost.HIDDEN_PATH != null)
+        for (var i = 0; i < server.vhost.HIDDEN_PATH.length; i++)
+            if (server.path.indexOf(server.vhost.HIDDEN_PATH[i]) == 0 || server.path.indexOf(server.vhost.HIDDEN_PATH[i]) == 1) {
+                server.printError(404, "Page Not Found");
+                return;
+            }
 
-      if (global.path.indexOf(apiExt, global.path.length - apiExt.length) !== -1) {
-        global.module.filter.api.filter(global, request, response, session, function(code, data) {
-          response.writeHead(200, { 'Content-Type': 'text/json; charset=UTF-8' });
-          response.end(JSON.stringify({code: code, data: data}), 'UTF-8');
-        });
-      } else if (global.path == global.vhost[global.port][global.host]['api-doc']) {
-        global.module.filter.apiDoc.filter(global, request, response, session);
-      } else if (global.path.indexOf(orbisExt, global.path.length - orbisExt.length) !== -1) {
-        global.module.filter.orbis.filter(global, request, response, session);
-      } else {
-        global.module.filter.stream.filter(global, request, response, session);
-      }
-    }
-  );
+    if (require('path').existsSync(server.vhost.DIR + server.path) == false)
+        server.printError(404, 'PAGE NOT FOUND');
+
+    global.module.session.start(server, function (session) {
+        if (server.path == server.vhost.API_DOC) {
+            global.module.filter.apiDoc.filter(server, session, function (code, result) {
+                server.response.writeHead(code, {'Content-Type': 'text/json; charset=UTF-8'});
+                server.response.end(JSON.stringify(result), 'UTF-8');
+            });
+        } else if (server.vhost.EXT_API != null && server.path.endsWith(server.vhost.EXT_API)) {
+            global.module.filter.api.filter(server, session, function (code, result) {
+                server.response.writeHead(code, {'Content-Type': 'text/json; charset=UTF-8'});
+                server.response.end(JSON.stringify({code: code, data: result}), 'UTF-8');
+            });
+        } else if (server.vhost.EXT_ORBIS != null && server.path.endsWith(server.vhost.EXT_ORBIS)) {
+            global.module.filter.orbis.filter(server, session, function (code, result, type) {
+                server.response.writeHead(code, {'Content-Type': type});
+                server.response.end(result);
+            });
+        } else {
+            global.module.filter.stream.filter(server, session, function (code, result, type) {
+                server.response.writeHead(code, {'Content-Type': type});
+                server.response.end(result);
+            });
+        }
+    });
 }

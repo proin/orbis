@@ -1,8 +1,26 @@
 {
   "8080": {
+    "localhost": {
+      "description": "Develop Core Engine",
+      "dir": "/Users/proin/Dropbox/workspace/nodejs/server/web-src",
+      "api-ext": ".api.js",
+      "api-doc": "/api.doc",
+      "doc-index": [
+        "index.html"
+      ],
+      "session-expire": "1w",
+      "orbis-ext": ".html"
+    },
     "127.0.0.1": {
       "description": "Develop Core Engine",
       "dir": "/Users/proin/Dropbox/workspace/nodejs/server/test",
+      "hidden-path": [
+        "/template", "/error"
+      ],
+      "error-page": {
+        "404" : "error/404.html",
+        "500" : "error/500.html"
+      },
       "api-ext": ".api.js",
       "api-doc": "/api.doc",
       "doc-index": [

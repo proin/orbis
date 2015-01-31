@@ -1,118 +1,58 @@
-exports.filter = function (global, request, response, session) {
-  var fs = require('fs');
-  var path = global.path;
-  path = global.vhost[global.port][global.host]['dir'] + path;
-  data = fs.readFileSync(path);
+exports.filter = function (server, session, callback) {
+    var fs = require('fs');
+    data = fs.readFileSync(server.vhost.DIR + server.path) + '';
 
-  exports.orbisApi(global, request, response, session, data, function(result) {
-    var print = '<html>\n' + result + '\n</html>';
-    response.writeHead(200, {'Content-Type': 'text/html'});
-    response.end(print);
-  });
-}
+    var orbisApi = function (server, session, data, callback) {
+        data += '';
 
-exports.orbisApi = function(global, request, response, session, data, callback) {
-  var orbis = {
-    api: require(global.homeDir + "/filter/orbis/role/api.js"),
-    auth: require(global.homeDir + "/filter/orbis/role/auth.js"),
-    template: require(global.homeDir + "/filter/orbis/role/template.js"),
-    query: require(global.homeDir + "/filter/orbis/role/query.js"),
-    session: require(global.homeDir + "/filter/orbis/role/session.js")
-  }
+        data = data.replace(/\n/g, '');
+        data = data.replace(/<!--.*?-->/gim, '');
 
-  var fs = require('fs');
+        var fs = require('fs');
 
-  var jsdom = require('jsdom');
-  var jquery = fs.readFileSync(global.homeDir + '/libs/jquery.js');
+        var re = /<orbis.*?role="(.*?)".*?<\/?orbis>/gim;
+        var finded = re.exec(data);
+        if (finded == null) {
+            callback(200, data);
+            return;
+        }
 
-  jsdom.env({
-    html: data,
-    src: [jquery],
-    done: function (errors, window) {
-      var $ = window.$;
+        var role = finded[1];
 
-      if($('orbis').length == 0) {
-        callback($('html').html());
-        return;
-      }
+        if (role == 'api') {
+            global.module.filter.orbis.api.parse(server, session, finded[0], function (result) {
+                re = /<orbis.*?name="(.*?)".*?<\/?orbis>/gim;
+                var valueName = re.exec(finded[0]);
+                valueName = valueName == null ? 'apiResult' : valueName[1];
+                data = data.replace(finded[0], '<script type="text/javascript">var ' + valueName + '=' + JSON.stringify(result) + '</script>');
+                orbisApi(server, session, data, callback);
+            });
+        } else if (role == 'auth') {
+            global.module.filter.orbis.auth.parse(server, session, finded[0], function (auth, result) {
+                if (auth == false) data = data.replace(/<body.*?<\/?body>/gim, '<body>' + result + '</body>');
+                else data = data.replace(finded[0], result);
+                orbisApi(server, session, data, callback);
+            });
+        } else if (role == 'template') {
+            global.module.filter.orbis.template.parse(server, session, finded[0], function (result) {
+                data = data.replace(finded[0], result);
+                orbisApi(server, session, data, callback);
+            });
+        } else if (role == 'query') {
+            global.module.filter.orbis.query.parse(server, session, finded[0], function (result) {
+                data = data.replace(finded[0], result);
+                orbisApi(server, session, data, callback);
+            });
+        } else if (role == 'session') {
+            global.module.filter.orbis.session.parse(server, session, finded[0], function (result) {
+                data = data.replace(finded[0], result);
+                orbisApi(server, session, data, callback);
+            });
+        } else {
+            data = data.replace(finded[0], '');
+            orbisApi(server, session, data, callback);
+        }
+    };
 
-      var object = $('orbis').first();
-      var role = object.attr('role');
-      if(orbis[role] != null) {
-        orbis[role].parse(
-          global,
-          request,
-          response,
-          session,
-          object,
-          function(roleType, data) {
-            if(roleType=='api') {
-              var valName = '';
-              var replaceString = '';
-              if(object.attr('value') != null) {
-                valName = object.attr('value');
-                replaceString = '<script type="text/javascript">var ' + valName + ' = ' + JSON.stringify(data.print) + '</script>';
-              }
-              object.replaceWith(replaceString);
-            } else if(roleType=='auth') {
-              if(data.allow == false) {
-                $('body').html(data.print);
-                callback($('html').html());
-                return;
-              } else {
-                object.replaceWith(data.print);
-              }
-            } else if(roleType=='template') {
-              object.replaceWith(data.data);
-            } else if(roleType=='query' || roleType=='session') {
-              var replaceString = '';
-              if(object.attr('type') != null) {
-                if(object.attr('type') == 'javascript' && object.attr('key') == null) {
-                  var valName = roleType;
-                  if(object.attr('value') != null) {
-                    valName = object.attr('value');
-                  }
-                  replaceString = '<script type="text/javascript">var ' + valName + ' = ' + JSON.stringify(data.print) + '</script>';
-                } else if(object.attr('type') == 'javascript' && object.attr('key') != null) {
-                  var valName = roleType;
-                  if(object.attr('value') != null) {
-                    valName = object.attr('value');
-                  }
-                  var queryKey = object.attr('key');
-                  if(data.print[queryKey] != null) {
-                    replaceString = '<script type="text/javascript">var ' + valName + ' = ' + JSON.stringify(data.print[queryKey]) + '</script>';
-                  }
-                } else if(object.attr('type') == 'html' && object.attr('key') == null) {
-                  replaceString = JSON.stringify(data.print);
-                } else if(object.attr('type') == 'html' && object.attr('key') != null) {
-                  var queryKey = object.attr('key');
-                  if(data.print[queryKey] != null) {
-                    if(typeof data.print[queryKey] == 'string') {
-                      replaceString = data.print[queryKey];
-                    } else {
-                      replaceString = JSON.stringify(data.print[queryKey]);
-                    }
-                  }
-                } else if(object.attr('type') == 'check' && object.attr('key') != null) {
-                  var queryKey = object.attr('key');
-                  if(data.print[queryKey] != null) {
-                    replaceString = object.find('exist').html();
-                  } else {
-                    replaceString = object.find('not-exist').html();
-                  }
-                }
-              }
-              object.replaceWith(replaceString);
-            } else {
-              object.replaceWith('');
-            }
-            exports.orbisApi(global, request, response, session, $('html').html(), callback);
-          }
-        );
-      } else {
-        object.replaceWith('');
-        exports.orbisApi(global, request, response, session, $('html').html(), callback);
-      }
-    }
-  });
+    orbisApi(server, session, data, callback);
 }
