@@ -12,7 +12,18 @@ exports.filter = function (server, session, callback) {
 			return;
 		}
 
-		data = data.replace(finded[0], orbisScriptVariable.attr[finded[1]] == null ? '' : orbisScriptVariable.attr[finded[1]]);
+		var attrs = orbisScriptVariable.attr[finded[1]];
+		if (attrs == null || typeof attrs != 'object') {
+			if (typeof attrs == 'string') data = data.replace(finded[0], attrs);
+			else data = data.replace(finded[0], '');
+		} else {
+			var replacement = '';
+			Object.keys(attrs).forEach(function (key) {
+				if (typeof attrs[key] == 'string')
+					replacement += key.replace(/"/gi, '') + '="' + attrs[key].replace(/"/gi, '') + '" ';
+			});
+			data = data.replace(finded[0], replacement);
+		}
 		orbisAttr(data);
 	}
 
