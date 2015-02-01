@@ -1,5 +1,12 @@
 exports.start = function (port) {
-    var orbisWebCore = require('http').createServer(function (request, response) {
+    require('http').createServer(function (request, response) {
+        orbisWebCore(request, response);
+    }).listen(global.port, function () {
+        var date = new Date();
+        console.log('# Server Running : ' + global.port + ' (' + date + ')');
+    });
+
+    var orbisWebCore = function (request, response) {
         process.setMaxListeners(0);
         process.on('uncaughtException', function (err) {
             try {
@@ -96,10 +103,5 @@ exports.start = function (port) {
                 global.module.filter.handle(server);
             });
         }
-    });
-
-    orbisWebCore.listen(global.port, function () {
-        var date = new Date();
-        console.log('# Server Running : ' + global.port + ' (' + date + ')');
-    });
+    }
 }

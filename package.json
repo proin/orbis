@@ -12,6 +12,6 @@
     "mongodb": ">= 1.4.12",
     "mysql": ">= 2.5.2",
     "node-uuid": ">= 1.4.1",
-    "jsdom": ">= 2.0.0"
+    "webworker-threads": ">=0.5.3"
   }
 }
