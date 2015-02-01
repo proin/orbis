@@ -103,6 +103,12 @@ exports.filter = function (server, session, callback) {
 	};
 
 	var fs = require('fs');
-	data = fs.readFileSync(server.vhost.DIR + server.path) + '';
-	orbisTag(data);
+	data = fs.readFile(server.vhost.DIR + server.path, function (err, data) {
+		if (err) {
+			callback(500, err);
+			return;
+		}
+		data += '';
+		orbisTag(data);
+	});
 }
