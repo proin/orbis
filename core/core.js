@@ -1,5 +1,5 @@
 exports.start = function () {
-    if (require('path').existsSync('./session') == false)
+    if (require('fs').existsSync('./session') == false)
         require('fs').mkdirSync('./session');
 
     global.HOME_DIR = __dirname;

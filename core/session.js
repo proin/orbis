@@ -44,12 +44,12 @@ exports.checkUUID = function (server, hostname, preUUID) {
     var fs = require('fs');
 
     var hostHome = './session/_' + hostname;
-    if (require('path').existsSync(hostHome) == false)
+    if (require('fs').existsSync(hostHome) == false)
         fs.mkdirSync(hostHome);
 
     var sessionInfo = {};
 
-    if (preUUID != null && require('path').existsSync(hostHome + '/' + preUUID + '.json')) {
+    if (preUUID != null && require('fs').existsSync(hostHome + '/' + preUUID + '.json')) {
         sessionInfo = JSON.parse(fs.readFileSync(hostHome + '/' + preUUID + '.json'));
 
         var sessionDate = new Date(sessionInfo.date);
@@ -66,7 +66,7 @@ exports.checkUUID = function (server, hostname, preUUID) {
     }
 
     var uuid = require('node-uuid').v4();
-    while (require('path').existsSync(hostHome + '/' + uuid + '.json') == true)
+    while (require('fs').existsSync(hostHome + '/' + uuid + '.json') == true)
         uuid = require('node-uuid').v4();
 
     sessionInfo.uuid = uuid;

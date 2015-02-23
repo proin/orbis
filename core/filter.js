@@ -6,7 +6,7 @@ exports.handle = function (server) {
 				return;
 			}
 
-	if (require('path').existsSync(server.vhost.DIR + server.path) == false)
+	if (require('fs').existsSync(server.vhost.DIR + server.path) == false)
 		server.printError(404, 'PAGE NOT FOUND');
 
 	global.module.session.start(server, function (session) {

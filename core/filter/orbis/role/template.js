@@ -52,7 +52,7 @@ exports.parse = function (server, session, object, callback) {
         }
     }
 
-    if (require('path').existsSync(resultPath)) {
+    if (require('fs').existsSync(resultPath)) {
         data = fs.readFileSync(resultPath) + '';
     }
 

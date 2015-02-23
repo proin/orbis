@@ -13,7 +13,7 @@ exports.parse = function (server, session, object, callback) {
         apiPath = global.config.vhost()[url.port][url.hostname]['dir'] + url.pathname;
     } else {
         if (url.pathname.startsWith('/')) {
-            if (require('path').existsSync(server.vhost.DIR + url.pathname))
+            if (require('fs').existsSync(server.vhost.DIR + url.pathname))
                 apiPath = server.vhost.DIR + url.pathname;
         } else {
             var path = server.path;
@@ -41,12 +41,12 @@ exports.parse = function (server, session, object, callback) {
                     resultPath += pathArr[i] + '/';
             resultPath += targetFileName;
 
-            if (require('path').existsSync(resultPath))
+            if (require('fs').existsSync(resultPath))
                 apiPath = resultPath;
         }
     }
 
-    if (require('path').existsSync(apiPath) == false) {
+    if (require('fs').existsSync(apiPath) == false) {
         callback({code: 404, data: 'Not Found'});
         return;
     }
