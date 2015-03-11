@@ -1,5 +1,5 @@
 exports.filter = function (server, session, callback) {
-    if (require('path').existsSync(server.vhost.DIR + server.path) == false) {
+    if (require('fs').existsSync(server.vhost.DIR + server.path) == false) {
         callback(404, 'API Not Found');
         return;
     }

@@ -2,7 +2,7 @@
 	"8080": {
 		"localhost": {
 			"description": "Develop Core Engine",
-			"dir": "/Users/proin/Dropbox/workspace/nodejs/server/web-src",
+			"dir": "/Users/proin/Dropbox/workspace/nodejs/orbis/web-src",
 			"api-ext": ".api.js",
 			"api-doc": "/api.doc",
 			"doc-index": [
@@ -18,7 +18,7 @@
 		},
 		"127.0.0.1": {
 			"description": "Develop Core Engine",
-			"dir": "/Users/proin/Dropbox/workspace/nodejs/server/test",
+			"dir": "/Users/proin/Dropbox/workspace/nodejs/orbis/test",
 			"hidden-path": [
 				"/template",
 				"/error"
