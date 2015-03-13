@@ -50,7 +50,7 @@ exports.filter = function (server, session, callback) {
             response: function (code, body) {
                 callback(code, body);
                 try {
-                    if (db != null) db.end();
+                    if (db != null) global.module.database.close(apiModule.db, db);
                 } catch(e) {
                 }
             },
