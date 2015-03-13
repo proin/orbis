@@ -49,7 +49,10 @@ exports.filter = function (server, session, callback) {
         apiModule.result({
             response: function (code, body) {
                 callback(code, body);
-                if (db != null && db.close != null) db.close();
+                try {
+                    if (db != null) db.close();
+                } catch(e) {
+                }
             },
             query: server.query,
             db: db,
