@@ -50,7 +50,7 @@ exports.filter = function (server, session, callback) {
             response: function (code, body) {
                 callback(code, body);
                 try {
-                    if (db != null) db.close();
+                    if (db != null) db.end();
                 } catch(e) {
                 }
             },
