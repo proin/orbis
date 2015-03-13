@@ -108,7 +108,7 @@ exports.parse = function (server, session, object, callback) {
                     if (db != null) global.module.database.close(apiModule.db, db);
                 } catch (e) {
                 }
-                callback({code: code, body: body});
+                callback({code: code, data: body});
             },
             query: url.query,
             db: db,
