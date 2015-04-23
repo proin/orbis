@@ -5,13 +5,12 @@
     "name": "Chae Yeonghun",
     "email": "proin@proinlab.com"
   },
-  "version": "0.0.1",
+  "version": "0.1.10",
   "private": true,
   "dependencies": {
     "mime": ">= 1.2.11",
     "mongodb": ">= 1.4.12",
     "mysql": ">= 2.5.2",
-    "node-uuid": ">= 1.4.1",
-    "webworker-threads": ">=0.5.3"
+    "node-uuid": ">= 1.4.1"
   }
 }

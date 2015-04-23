@@ -1,5 +1,4 @@
-exports.filter = function (server, session, callback) {
-
+exports.filter = function (server) {
     var fs = require('fs');
     var explorer = function (dir, done) {
         var results = [];
@@ -17,9 +16,11 @@ exports.filter = function (server, session, callback) {
                             next();
                         });
                     } else {
-                        var apiExt = server.vhost.EXT_API;
-                        if (file.indexOf(apiExt, file.length - apiExt.length) !== -1) {
-                            results.push(file);
+                        var apiExt = server.vhost.filter.api;
+                        for (var i = 0; i < apiExt.length; i++) {
+                            if (file.indexOf(apiExt[i], file.length - apiExt[i].length) !== -1) {
+                                results.push(file);
+                            }
                         }
                         next();
                     }
@@ -28,11 +29,11 @@ exports.filter = function (server, session, callback) {
         });
     };
 
-    var rootDir = server.vhost.DIR;
+    var rootDir = server.vhost.dir;
 
     explorer(rootDir, function (err, results) {
         if (err) {
-            callback(500, err);
+            exports.response(server, 500, err);
         } else {
             var html = [];
             for (var i = 0; i < results.length; i++) {
@@ -53,9 +54,12 @@ exports.filter = function (server, session, callback) {
                 html.push(d);
             }
 
-            callback(200, html);
+            exports.response(server, 200, html);
         }
     });
-
 }
 
+exports.response = function (server, code, result) {
+    server.response.writeHead(code, {'Content-Type': 'text/json; charset=UTF-8'});
+    server.response.end(JSON.stringify(result), 'UTF-8');
+}

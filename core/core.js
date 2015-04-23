@@ -3,9 +3,7 @@ exports.start = function () {
         require('fs').mkdirSync('./session');
 
     global.HOME_DIR = __dirname;
-
     global.server = require('./server.js');
-
     global.config = {
         vhost: function () {
             return JSON.parse(require('fs').readFileSync('./config/vhost.json') + '');
@@ -14,25 +12,8 @@ exports.start = function () {
 
     global.module = {
         session: require('./session.js'),
-        filter: {
-            handle: function (server) {
-                require('./filter.js').handle(server);
-            },
-            api: require('./filter/api.js'),
-            apiDoc: require('./filter/apidoc.js'),
-            stream: require('./filter/stream.js'),
-            orbis: {
-                filter: function (server, session, callback) {
-                    require('./filter/orbis/core.js').filter(server, session, callback);
-                },
-                api: require(global.HOME_DIR + "/filter/orbis/role/api.js"),
-                auth: require(global.HOME_DIR + "/filter/orbis/role/auth.js"),
-                template: require(global.HOME_DIR + "/filter/orbis/role/template.js"),
-                query: require(global.HOME_DIR + "/filter/orbis/role/query.js"),
-                session: require(global.HOME_DIR + "/filter/orbis/role/session.js")
-            }
-        },
-        database: require('./database/controller.js')
+        filter: require('./filter.js'),
+        database: require(global.HOME_DIR + '/database/controller.js')
     };
 
     for (port in config.vhost()) {

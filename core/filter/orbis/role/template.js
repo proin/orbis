@@ -14,7 +14,7 @@ exports.parse = function (server, session, object, callback) {
 
     if (url.pathname != null) {
         if (url.pathname.startsWith('/')) {
-            resultPath = server.vhost.DIR + url.pathname;
+            resultPath = server.vhost.dir + url.pathname;
         } else {
             var path = server.path;
 
@@ -42,7 +42,7 @@ exports.parse = function (server, session, object, callback) {
                 }
             }
 
-            resultPath = server.vhost.DIR + '/';
+            resultPath = server.vhost.dir + '/';
             for (var i = 0; i < pathArr.length - pre; i++) {
                 if (pathArr[i].length > 0) {
                     resultPath += pathArr[i] + '/';
@@ -60,7 +60,7 @@ exports.parse = function (server, session, object, callback) {
         var re = /(<)(orbis)(.*?)(<\/?orbis>)/gi;
         var finded = re.exec(data);
         if (finded == null) break;
-        var replacement = finded[1] + 'template-' + finded[2] + ' parent="' + resultPath.replace(server.vhost.DIR, '') + '"' + finded[3] + finded[4];
+        var replacement = finded[1] + 'template-' + finded[2] + ' parent="' + resultPath.replace(server.vhost.dir, '') + '"' + finded[3] + finded[4];
         data = data.replace(finded[0], replacement);
     }
 

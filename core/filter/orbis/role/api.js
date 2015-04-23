@@ -13,8 +13,8 @@ exports.parse = function (server, session, object, callback) {
         apiPath = global.config.vhost()[url.port][url.hostname]['dir'] + url.pathname;
     } else {
         if (url.pathname.startsWith('/')) {
-            if (require('fs').existsSync(server.vhost.DIR + url.pathname))
-                apiPath = server.vhost.DIR + url.pathname;
+            if (require('fs').existsSync(server.vhost.dir + url.pathname))
+                apiPath = server.vhost.dir + url.pathname;
         } else {
             var path = server.path;
             var pathArr = path.split('/');
@@ -35,7 +35,7 @@ exports.parse = function (server, session, object, callback) {
                 }
             }
 
-            var resultPath = server.vhost.DIR + '/';
+            var resultPath = server.vhost.dir + '/';
             for (var i = 0; i < pathArr.length - pre; i++)
                 if (pathArr[i].length > 0)
                     resultPath += pathArr[i] + '/';

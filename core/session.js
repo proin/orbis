@@ -11,7 +11,7 @@ exports.start = function (server, callback) {
         cookies[key] = val;
     }
 
-    var hostname = server.vhost.SESSION_WITH;
+    var hostname = server.vhost['session-with'];
     if (hostname == null) hostname = server.host;
 
     var fs = require('fs');
@@ -56,7 +56,7 @@ exports.checkUUID = function (server, hostname, preUUID) {
         var now = new Date();
         var diff = now - sessionDate;
 
-        if (diff < server.vhost.SESSION_EXPIRE) {
+        if (diff < server.vhost['session-expire']) {
             sessionInfo.date = new Date().toString();
             fs.writeFileSync(hostHome + '/' + preUUID + '.json', JSON.stringify(sessionInfo));
             return JSON.parse(fs.readFileSync(hostHome + '/' + preUUID + '.json'));

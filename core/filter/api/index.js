@@ -1,11 +1,11 @@
-exports.filter = function (server, session, callback) {
-    if (require('fs').existsSync(server.vhost.DIR + server.path) == false) {
-        callback(404, 'API Not Found');
+exports.filter = function (server, session) {
+    if (require('fs').existsSync(server.vhost.dir + server.path) == false) {
+        exports.response(server, 404, 'API Not Found');
         return;
     }
 
-    delete require.cache[server.vhost.DIR + server.path];
-    var apiModule = require(server.vhost.DIR + server.path);
+    delete require.cache[server.vhost.dir + server.path];
+    var apiModule = require(server.vhost.dir + server.path);
 
     var keys = [];
     Object.keys(apiModule.doc.params).forEach(function (key) {
@@ -36,22 +36,22 @@ exports.filter = function (server, session, callback) {
         queryOption = true;
 
     if (queryOption == false) {
-        callback(403, 'Server Allows Only ' + apiModule.method + ' Method');
+        exports.response(server, 403, 'Server Allows Only ' + apiModule.method + ' Method');
         return;
     }
 
     if (paramsRequirement == false) {
-        callback(400, 'Not Enough Query');
+        exports.response(server, 400, 'Not Enough Query');
         return;
     }
 
     global.module.database.connect(apiModule.db, function (err, db) {
         apiModule.result({
             response: function (code, body) {
-                callback(code, body);
+                exports.response(server, code, body);
                 try {
                     if (db != null) global.module.database.close(apiModule.db, db);
-                } catch(e) {
+                } catch (e) {
                 }
             },
             query: server.query,
@@ -59,5 +59,9 @@ exports.filter = function (server, session, callback) {
             session: session
         });
     });
+}
 
+exports.response = function (server, code, result) {
+    server.response.writeHead(code, {'Content-Type': 'text/json; charset=UTF-8'});
+    server.response.end(JSON.stringify({code: code, data: result}), 'UTF-8');
 }
