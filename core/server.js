@@ -26,6 +26,8 @@ exports.start = function (port) {
         server.response = response;
 
         var vhost = global.config.vhost();
+        if (!vhost[port][server.host]) server.host = 'default';
+        if (!vhost[port][server.host]) return;
         server.vhost = vhost[port][server.host];
 
         if (server.vhost['doc-index'] == null)
@@ -48,14 +50,15 @@ exports.start = function (port) {
         var type = require('mime').lookup(path);
         var data = '';
         var changed = false;
-        if (type == 'application/octet-stream')
-            for (var i = 0; i < server.vhost['doc-index'].length; i++)
+        if (type == 'application/octet-stream' && require('fs').existsSync(path) == true) {
+            for (var i = 0; i < server.vhost['doc-index'].length; i++) {
                 if (require('fs').existsSync(path + '/' + server.vhost['doc-index'][i])) {
                     server.path += server.path.endsWith('/') ? server.vhost['doc-index'][i] : '/' + server.vhost['doc-index'][i];
                     changed = true;
                     break;
                 }
-        if (changed == false && type == 'application/octet-stream') server.path += server.path.endsWith('/') ? server.vhost['doc-index'][0] : '/' + server.vhost['doc-index'][0];
+            }
+        }
 
         server.printError = function (code, data) {
             if (data == null) data = "error";
