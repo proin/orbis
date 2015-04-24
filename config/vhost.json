@@ -3,38 +3,40 @@
         "localhost": {
             "activation": true,
             "description": "Develop Core Engine",
-            "dir": "/Users/proin/Dropbox/workspace/nodejs/orbis/web-src",
+            "dir": "$ORBIS_HOME/web-src",
             "session-expire": "1w",
             "doc-index": ["index.html"],
             "filter": {
                 "api": [".api.js"],
                 "apidoc": ["/api.doc"],
                 "orbis": [".html"],
-                "php": [".php"]
+                "php": [".php"],
+                "central-repo": ["/central"]
             }
         }
     },
     "443": {
         "ssl": {
-            "key": "/Users/proin/Dropbox/workspace/nodejs/orbis/sslcert/key.pem",
-            "cert": "/Users/proin/Dropbox/workspace/nodejs/orbis/sslcert/server.crt"
+            "key": "$ORBIS_HOME/sslcert/key.pem",
+            "cert": "$ORBIS_HOME/sslcert/server.crt"
         },
         "default": {
             "description": "Develop Core Engine",
-            "dir": "/Users/proin/Dropbox/workspace/nodejs/orbis/web-src",
+            "dir": "$ORBIS_HOME/web-src",
             "session-expire": "1w",
             "doc-index": ["index.html"],
             "filter": {
                 "api": [".api.js"],
                 "apidoc": ["/api.doc"],
                 "orbis": [".html"],
-                "php": [".php"]
+                "php": [".php"],
+                "central-repo": ["/central"]
             }
         },
         "127.0.0.1": {
             "activation": true,
             "description": "Develop Core Engine",
-            "dir": "/Users/proin/Dropbox/workspace/nodejs/orbis/test",
+            "dir": "$ORBIS_HOME/test",
             "hidden-path": [
                 "/template",
                 "/error"
@@ -48,7 +50,8 @@
                 "api": [".api.js"],
                 "apidoc": ["/api.doc"],
                 "orbis": [".html"],
-                "php": [".php"]
+                "php": [".php"],
+                "central-repo": ["/central"]
             }
         }
     }

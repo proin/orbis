@@ -5,8 +5,16 @@ exports.start = function () {
     global.HOME_DIR = __dirname;
     global.server = require('./server.js');
     global.config = {
+        orbis: function () {
+            var config = require('fs').readFileSync('./config/orbis-config.json') + '';
+            config = config.replace(/\$ORBIS_HOME/gim, __dirname.substring(0, __dirname.length - 5));
+            var result = JSON.parse(config);
+            return result;
+        },
         vhost: function () {
-            var result = JSON.parse(require('fs').readFileSync('./config/vhost.json') + '');
+            var config = require('fs').readFileSync('./config/vhost.json') + '';
+            config = config.replace(/\$ORBIS_HOME/gim, __dirname.substring(0, __dirname.length - 5));
+            var result = JSON.parse(config);
             for (port in result) {
                 var hosts = false;
                 for (host in result[port]) {

@@ -1,4 +1,7 @@
 exports.filter = function (server, session) {
+    if (require('fs').existsSync(server.vhost.dir + server.path) == false)
+        server.printError(404, 'PAGE NOT FOUND');
+
     var type = require('mime').lookup(server.vhost.dir + server.path);
     server.response.writeHead(200, {'Content-Type': type});
     var readStream = require('fs').createReadStream(server.vhost.dir + server.path);

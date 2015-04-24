@@ -15,16 +15,16 @@ exports.handle = function (server) {
         for (filter in server.vhost.filter) {
             for (i in server.vhost.filter[filter]) {
                 var filterext = server.vhost.filter[filter][i];
-                if (server.path.endsWith(filterext)) {
-                    filters[filter].filter(server, session);
+                if (filterext.startsWith('.') && server.path.endsWith(filterext)) {
+                    filters[filter].filter(server, session, filterext);
+                    return;
+                } else if (filterext.startsWith('.') == false && server.path.startsWith(filterext)) {
+                    filters[filter].filter(server, session, filterext);
                     return;
                 }
             }
         }
 
-        if (require('fs').existsSync(server.vhost.dir + server.path) == false)
-            server.printError(404, 'PAGE NOT FOUND');
-        else
-            filters.stream.filter(server, session);
+        filters.stream.filter(server, session);
     });
 }
