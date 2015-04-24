@@ -4,8 +4,10 @@ exports.parse = function (server, session, object, callback) {
     var data = null;
     var trans = {};
     while (true) {
-        var re = /<(.*?)>(.*?)<\/.*?\1>/gim;
+        var re = /<(.*?)>(.*?)<\/\1>/gim;
         var finded = re.exec(org);
+
+        console.log(finded);
         if (!finded) break;
         trans[finded[1]] = finded[2];
         org = org.replace(finded[0], '');

@@ -6,18 +6,32 @@ exports.start = function () {
     global.server = require('./server.js');
     global.config = {
         vhost: function () {
-            return JSON.parse(require('fs').readFileSync('./config/vhost.json') + '');
+            var result = JSON.parse(require('fs').readFileSync('./config/vhost.json') + '');
+            for (port in result) {
+                var hosts = false;
+                for (host in result[port]) {
+                    if (result[port][host].activation == null)
+                        result[port][host].activation = true;
+                    if (result[port][host].activation)
+                        hosts = true;
+                    else
+                        delete result[port][host];
+                }
+
+                if (!hosts) delete result[port];
+            }
+            return result;
         }
     };
 
     global.module = {
         session: require('./session.js'),
-        filter: require('./filter.js'),
-        database: require(global.HOME_DIR + '/database/controller.js')
+        filter: require('./filter.js')
     };
 
-    for (port in config.vhost()) {
-        server.start(port);
+    var vhost = config.vhost();
+    for (port in vhost) {
+        server.start(port, vhost[port].ssl);
     }
 }
 

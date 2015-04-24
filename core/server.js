@@ -1,16 +1,33 @@
-exports.start = function (port) {
+exports.start = function (port, ssl) {
     var filters = {};
     var filterList = require('fs').readdirSync(global.HOME_DIR + '/filter/');
     for (var i = 0; i < filterList.length; i++)
         if (require('fs').existsSync(global.HOME_DIR + '/filter/' + filterList[i] + '/index.js') == true)
             filters[filterList[i]] = require(global.HOME_DIR + '/filter/' + filterList[i] + '/index.js');
 
-    require('http').createServer(function (request, response) {
-        orbisWebCore(request, response);
-    }).listen(global.port, function () {
-        var date = new Date();
-        console.log('# Server Running : ' + global.port + ' (' + date + ')');
-    });
+    if (ssl) {
+        var httpserver = require('https');
+        var opts = {
+            key: require('fs').readFileSync(global.config.vhost()[port].ssl.key, 'utf8'),
+            cert: require('fs').readFileSync(global.config.vhost()[port].ssl.cert, 'utf8')
+        };
+
+        httpserver.createServer(opts, function (request, response) {
+            orbisWebCore(request, response);
+        }).listen(port, function () {
+            var date = new Date();
+            console.log('# Server Running : ' + port + ' (' + date + ')');
+        });
+    } else {
+        var httpserver = require('http');
+        httpserver.createServer(function (request, response) {
+            orbisWebCore(request, response);
+        }).listen(port, function () {
+            var date = new Date();
+            console.log('# Server Running : ' + port + ' (' + date + ')');
+        });
+    }
+
 
     var orbisWebCore = function (request, response) {
         process.setMaxListeners(0);
@@ -28,13 +45,17 @@ exports.start = function (port) {
         server.lang = request.headers["accept-language"];
         server.method = request.method;
         server.path = require('url').parse(request.url).pathname;
-
         server.request = request;
         server.response = response;
 
         var vhost = global.config.vhost();
         if (!vhost[port][server.host]) server.host = 'default';
-        if (!vhost[port][server.host]) return;
+        if (!vhost[port][server.host]) {
+            server.response.writeHead(404, {'Content-Type': 'text/json; charset=UTF-8'});
+            server.response.end(JSON.stringify({code: 404, data: 'Not Found: No Default Home'}), 'UTF-8');
+            return;
+        }
+
         server.vhost = vhost[port][server.host];
 
         if (server.vhost['doc-index'] == null)

@@ -7,6 +7,10 @@ exports.filter = function (server, session, module) {
         mdata.query = server.query;
     }
 
+    var modules = {
+        database: require(__dirname + '/modules/database.js')
+    };
+
     if (require('fs').existsSync(mdata.path) == false) {
         mdata.callback(server, 404, 'API Not Found');
         return;
@@ -21,13 +25,10 @@ exports.filter = function (server, session, module) {
     });
 
     var paramsRequirement = true;
-    for (var i = 0; i < keys.length; i++) {
-        if (apiModule.doc.params[keys[i]].indexOf('optional') == -1) {
-            if (!mdata.query[keys[i]]) {
+    for (var i = 0; i < keys.length; i++)
+        if (apiModule.doc.params[keys[i]].indexOf('optional') == -1)
+            if (!mdata.query[keys[i]])
                 paramsRequirement = false;
-            }
-        }
-    }
 
     var queryOption = false;
     if (apiModule.method == 'GET') {
@@ -53,7 +54,7 @@ exports.filter = function (server, session, module) {
         return;
     }
 
-    global.module.database.connect(apiModule.db, function (err, db) {
+    modules.database.connect(apiModule.db, function (err, db) {
         var orbisModules = {
             response: function (code, body) {
                 mdata.callback(server, code, body);
