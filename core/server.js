@@ -1,4 +1,10 @@
 exports.start = function (port) {
+    var filters = {};
+    var filterList = require('fs').readdirSync(global.HOME_DIR + '/filter/');
+    for (var i = 0; i < filterList.length; i++)
+        if (require('fs').existsSync(global.HOME_DIR + '/filter/' + filterList[i] + '/index.js') == true)
+            filters[filterList[i]] = require(global.HOME_DIR + '/filter/' + filterList[i] + '/index.js');
+
     require('http').createServer(function (request, response) {
         orbisWebCore(request, response);
     }).listen(global.port, function () {
@@ -16,9 +22,10 @@ exports.start = function (port) {
         });
 
         var server = {};
-
+        server.filters = filters;
         server.port = port;
         server.host = request.headers.host.replace(':' + port, '');
+        server.lang = request.headers["accept-language"];
         server.method = request.method;
         server.path = require('url').parse(request.url).pathname;
 

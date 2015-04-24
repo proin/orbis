@@ -1,10 +1,8 @@
 exports.handle = function (server) {
-    var filters = {};
-    var fs = require('fs');
-    var filterList = fs.readdirSync(global.HOME_DIR + '/filter/');
-    for (var i = 0; i < filterList.length; i++)
-        if (require('fs').existsSync(global.HOME_DIR + '/filter/' + filterList[i] + '/index.js') == true)
-            filters[filterList[i]] = require(global.HOME_DIR + '/filter/' + filterList[i] + '/index.js');
+    if (server.query.lang)
+        server.lang = server.query.lang + ',' + server.lang;
+
+    var filters = server.filters;
 
     if (server.vhost['hidden-path'] != null)
         for (var i = 0; i < server.vhost['hidden-path'].length; i++)

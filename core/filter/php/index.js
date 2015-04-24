@@ -5,7 +5,12 @@ exports.filter = function (server, session) {
         return;
     }
 
-    exports.run_cmd('php', [path], function (result) {
+    var args = ['-f', path];
+    for (var key in server.query)
+        args.push(key + '=' + server.query[key]);
+    console.log(args);
+
+    exports.run_cmd('php-cgi', args, function (result) {
         exports.response(server, 200, result, 'text/html');
     });
 }

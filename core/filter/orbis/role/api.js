@@ -46,73 +46,20 @@ exports.parse = function (server, session, object, callback) {
         }
     }
 
-    if (require('fs').existsSync(apiPath) == false) {
-        callback({code: 404, data: 'Not Found'});
-        return;
-    }
-
-    delete require.cache[apiPath];
-    var apiModule = require(apiPath);
-
-    var keys = [];
-    Object.keys(apiModule.doc.params).forEach(function (key) {
-        keys.push(key);
-    });
-
     url.query = require('querystring').parse(url.query);
-
     Object.keys(server.query).forEach(function (key) {
         if (url.query[key] == null) {
             url.query[key] = server.query[key];
         }
     });
 
-    var paramsRequirement = true;
-    for (var i = 0; i < keys.length; i++) {
-        if (apiModule.doc.params[keys[i]].indexOf('optional') == -1) {
-            if (url.query[keys[i]] == null) {
-                paramsRequirement = false;
-            }
+    var mdata = {
+        path: apiPath,
+        query: url.query,
+        callback: function (server, code, data) {
+            callback({code: code, data: data});
         }
     }
 
-    var queryOption = false;
-    if (apiModule.method == 'GET') {
-        if (server.request.method == 'GET')
-            queryOption = true;
-    }
-
-    if (apiModule.method == 'POST') {
-        if (server.request.method == 'POST')
-            queryOption = true;
-    }
-
-    if (apiModule.method == 'AUTO') {
-        queryOption = true;
-    }
-
-    if (queryOption == false) {
-        callback({code: 403, data: 'Server Allows Only ' + apiModule.method + ' Method'});
-        return;
-    }
-
-    if (paramsRequirement == false) {
-        callback({code: 400, data: 'Not Enough Query'});
-        return;
-    }
-
-    global.module.database.connect(apiModule.db, function (err, db) {
-        apiModule.result({
-            response: function (code, body) {
-                try {
-                    if (db != null) global.module.database.close(apiModule.db, db);
-                } catch (e) {
-                }
-                callback({code: code, data: body});
-            },
-            query: url.query,
-            db: db,
-            session: session
-        });
-    });
+    server.filters.api.filter(server, session, mdata);
 }

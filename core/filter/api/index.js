@@ -1,11 +1,19 @@
-exports.filter = function (server, session) {
-    if (require('fs').existsSync(server.vhost.dir + server.path) == false) {
-        exports.response(server, 404, 'API Not Found');
+exports.filter = function (server, session, module) {
+    var mdata = module;
+    if (!mdata) {
+        mdata = {};
+        mdata.path = server.vhost.dir + server.path;
+        mdata.callback = exports.response;
+        mdata.query = server.query;
+    }
+
+    if (require('fs').existsSync(mdata.path) == false) {
+        mdata.callback(server, 404, 'API Not Found');
         return;
     }
 
-    delete require.cache[server.vhost.dir + server.path];
-    var apiModule = require(server.vhost.dir + server.path);
+    delete require.cache[mdata.path];
+    var apiModule = require(mdata.path);
 
     var keys = [];
     Object.keys(apiModule.doc.params).forEach(function (key) {
@@ -15,7 +23,7 @@ exports.filter = function (server, session) {
     var paramsRequirement = true;
     for (var i = 0; i < keys.length; i++) {
         if (apiModule.doc.params[keys[i]].indexOf('optional') == -1) {
-            if (server.query[keys[i]] == null) {
+            if (!mdata.query[keys[i]]) {
                 paramsRequirement = false;
             }
         }
@@ -36,28 +44,29 @@ exports.filter = function (server, session) {
         queryOption = true;
 
     if (queryOption == false) {
-        exports.response(server, 403, 'Server Allows Only ' + apiModule.method + ' Method');
+        mdata.callback(server, 403, 'Server Allows Only ' + apiModule.method + ' Method');
         return;
     }
 
     if (paramsRequirement == false) {
-        exports.response(server, 400, 'Not Enough Query');
+        mdata.callback(server, 400, 'Not Enough Query');
         return;
     }
 
     global.module.database.connect(apiModule.db, function (err, db) {
-        apiModule.result({
+        var orbisModules = {
             response: function (code, body) {
-                exports.response(server, code, body);
+                mdata.callback(server, code, body);
                 try {
                     if (db != null) global.module.database.close(apiModule.db, db);
                 } catch (e) {
                 }
             },
-            query: server.query,
+            query: mdata.query,
             db: db,
             session: session
-        });
+        };
+        apiModule.result(orbisModules);
     });
 }
 

@@ -4,15 +4,13 @@ exports.filter = function (server, session) {
         auth: require(global.HOME_DIR + "/filter/orbis/role/auth.js"),
         template: require(global.HOME_DIR + "/filter/orbis/role/template.js"),
         query: require(global.HOME_DIR + "/filter/orbis/role/query.js"),
-        session: require(global.HOME_DIR + "/filter/orbis/role/session.js")
+        session: require(global.HOME_DIR + "/filter/orbis/role/session.js"),
+        trans: require(global.HOME_DIR + "/filter/orbis/role/trans.js")
     }
 
     var orbisScriptVariable = {};
 
     var orbisAttr = function (data) {
-        data = data.replace(/\n/g, '');
-        data = data.replace(/<!--.*?-->/gim, '');
-
         var re = /orbis-attr="(.*?)"/gim;
         var finded = re.exec(data);
         if (finded == null) {
@@ -36,9 +34,6 @@ exports.filter = function (server, session) {
     }
 
     var orbisScript = function (data, script) {
-        data = data.replace(/\n/g, '');
-        data = data.replace(/<!--.*?-->/gim, '');
-
         var re = /<script role="orbis">(.*?)<\/?script>/gim;
         var finded = re.exec(data);
         if (finded == null) {
@@ -63,10 +58,11 @@ exports.filter = function (server, session) {
     }
 
     var orbisTag = function (data) {
+        data = data.replace(/  /g, ' ');
+        data = data.replace(/\t/g, '');
         data = data.replace(/\n/g, '');
-        data = data.replace(/<!--.*?-->/gim, '');
 
-        var re = /<orbis.*?role="(.*?)".*?<\/?orbis>/gim;
+        var re = /<orbis.*?role="(.*?)".*?>(.*?)<\/?orbis>/gim;
         var finded = re.exec(data);
         if (finded == null) {
             orbisScript(data, '');
@@ -74,7 +70,6 @@ exports.filter = function (server, session) {
         }
 
         var role = finded[1];
-
         if (role == 'api') {
             orbis.api.parse(server, session, finded[0], function (result) {
                 re = /<orbis.*?name="(.*?)".*?<\/?orbis>/gim;
@@ -101,6 +96,11 @@ exports.filter = function (server, session) {
             });
         } else if (role == 'session') {
             orbis.session.parse(server, session, finded[0], function (result) {
+                data = data.replace(finded[0], result);
+                orbisTag(data);
+            });
+        } else if (role == 'trans') {
+            orbis.trans.parse(server, session, finded[0], function (result) {
                 data = data.replace(finded[0], result);
                 orbisTag(data);
             });
