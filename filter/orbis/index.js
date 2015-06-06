@@ -1,11 +1,18 @@
-exports.filter = function (server, session) {
+/**
+ * now editing, do not use
+ *
+ * @param server
+ * @param callback
+ */
+
+exports.start = function (server, callback) {
     var orbis = {
-        api: require(global.HOME_DIR + "/filter/orbis/role/api.js"),
-        auth: require(global.HOME_DIR + "/filter/orbis/role/auth.js"),
-        template: require(global.HOME_DIR + "/filter/orbis/role/template.js"),
-        query: require(global.HOME_DIR + "/filter/orbis/role/query.js"),
-        session: require(global.HOME_DIR + "/filter/orbis/role/session.js"),
-        trans: require(global.HOME_DIR + "/filter/orbis/role/trans.js")
+        api: require("./role/api.js"),
+        auth: require("./role/auth.js"),
+        template: require("./role/template.js"),
+        query: require("./role/query.js"),
+        session: require("./role/session.js"),
+        trans: require("./role/trans.js")
     }
 
     var orbisScriptVariable = {};
@@ -14,7 +21,7 @@ exports.filter = function (server, session) {
         var re = /orbis-attr="(.*?)"/gim;
         var finded = re.exec(data);
         if (finded == null) {
-            exports.response(server, 200, data);
+            callback({code: 200, type: 'text/html', src: data});
             return;
         }
 
@@ -113,19 +120,10 @@ exports.filter = function (server, session) {
     var fs = require('fs');
     data = fs.readFile(server.vhost.dir + server.path, function (err, data) {
         if (err) {
-            exports.response(server, 500, err);
+            callback({code: 500, type: 'text/html', src: JSON.stringify(err)});
             return;
         }
         data += '';
         orbisTag(data);
     });
-}
-
-exports.response = function (server, code, result) {
-    if (code == 200) {
-        server.response.writeHead(code, {'Content-Type': 'text/html; charset=UTF-8'});
-        server.response.end(result);
-    } else {
-        server.printError(code, result);
-    }
 }

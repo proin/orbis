@@ -1,4 +1,17 @@
-exports.filter = function (server) {
+/**
+ * create api document in web root directory.
+ *
+ * @param server
+ * @param callback
+ */
+exports.start = function (server, callback) {
+    var apiExt = [];
+    for (var ext in server.vhost.filter) {
+        if (server.vhost.filter[ext] == 'api') {
+            apiExt.push(ext);
+        }
+    }
+
     var fs = require('fs');
     var explorer = function (dir, done) {
         var results = [];
@@ -16,9 +29,8 @@ exports.filter = function (server) {
                             next();
                         });
                     } else {
-                        var apiExt = server.vhost.filter.api;
                         for (var i = 0; i < apiExt.length; i++) {
-                            if (file.indexOf(apiExt[i], file.length - apiExt[i].length) !== -1) {
+                            if (file.endsWith(apiExt[i])) {
                                 results.push(file);
                             }
                         }
@@ -29,11 +41,11 @@ exports.filter = function (server) {
         });
     };
 
-    var rootDir = server.vhost.dir;
+    var rootDir = server.web_dir;
 
     explorer(rootDir, function (err, results) {
         if (err) {
-            exports.response(server, 500, err);
+            callback({code: 500, type: 'text/html', src: JSON.stringify(err)});
         } else {
             var html = [];
             for (var i = 0; i < results.length; i++) {
@@ -54,12 +66,7 @@ exports.filter = function (server) {
                 html.push(d);
             }
 
-            exports.response(server, 200, html);
+            callback({code: 200, type: 'text/html', src: JSON.stringify(html)});
         }
     });
-}
-
-exports.response = function (server, code, result) {
-    server.response.writeHead(code, {'Content-Type': 'text/json; charset=UTF-8'});
-    server.response.end(JSON.stringify(result), 'UTF-8');
 }

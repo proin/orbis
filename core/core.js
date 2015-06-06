@@ -1,52 +1,49 @@
+/**
+ * Running Server
+ */
 exports.start = function () {
-    if (require('fs').existsSync('./session') == false)
-        require('fs').mkdirSync('./session');
-
-    global.HOME_DIR = __dirname;
-    global.server = require('./server.js');
-    global.config = {
-        orbis: function () {
-            var config = require('fs').readFileSync('./config/orbis-config.json') + '';
-            config = config.replace(/\$ORBIS_HOME/gim, __dirname.substring(0, __dirname.length - 5));
-            var result = JSON.parse(config);
-            return result;
-        },
-        vhost: function () {
-            var config = require('fs').readFileSync('./config/vhost.json') + '';
-            config = config.replace(/\$ORBIS_HOME/gim, __dirname.substring(0, __dirname.length - 5));
-            var result = JSON.parse(config);
-            for (port in result) {
-                var hosts = false;
-                for (host in result[port]) {
-                    if (result[port][host].activation == null)
-                        result[port][host].activation = true;
-                    if (result[port][host].activation)
-                        hosts = true;
-                    else
-                        delete result[port][host];
-                }
-
-                if (!hosts) delete result[port];
-            }
-            return result;
-        }
-    };
-
-    global.module = {
-        session: require('./session.js'),
-        filter: require('./filter.js')
-    };
-
-    var vhost = config.vhost();
+    var vhost = __vhost;
+    var ssl = __ssl;
     for (port in vhost) {
-        server.start(port, vhost[port].ssl);
+        if (ssl[port]) {
+            require('https').createServer({
+                key: require('fs').readFileSync(ssl[port].key, 'utf8'),
+                cert: require('fs').readFileSync(ssl[port].cert, 'utf8')
+            }, function (request, response) {
+                serverHandler(request, response, vhost[port], port);
+            }).listen(port, function () {
+                runningMsg(port);
+            });
+        } else {
+            require('http').createServer(function (request, response) {
+                serverHandler(request, response, vhost[port], port);
+            }).listen(port, function () {
+                runningMsg(port);
+            });
+        }
     }
 }
 
-String.prototype.startsWith = function (suffix) {
-    return !(this.indexOf(suffix) !== 0);
-};
+/**
+ * Request and Response Handler
+ * @param request: web server request
+ * @param response: web server response
+ * @param vhost: virtual host information
+ * @param port: server port
+ */
+function serverHandler(request, response, vhost, port) {
+    var server = {}; // Local Variable about Request Information
+    server.port = port; // requested port
+    server.vhost = vhost;
+    server.request = request; // web server request
+    server.response = response; // web server response
 
-String.prototype.endsWith = function (suffix) {
-    return this.indexOf(suffix, this.length - suffix.length) !== -1;
-};
+    // Conntection Controller
+    require('./connection.js').connect(server);
+}
+
+// Server Running Message
+function runningMsg(port) {
+    var date = new Date();
+    console.log('# Server Running : ' + date);
+}

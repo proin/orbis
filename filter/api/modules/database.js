@@ -1,3 +1,10 @@
+/**
+ * control databases.
+ * now support mongodb and mysql.
+ *
+ * @param config
+ * @param callback
+ */
 exports.connect = function (config, callback) {
     if (config == null || config.type == null) {
         callback(true, null);
