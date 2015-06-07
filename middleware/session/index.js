@@ -13,6 +13,8 @@ exports.start = function (server, callback) {
         conf.session.expired = conf.session.expired.replace('h', '*60*60*1000*');
         conf.session.expired = conf.session.expired.replace('d', '*24*60*60*1000*');
         conf.session.expired = conf.session.expired.replace('w', '*7*24*60*60*1000*');
+        if (!conf.session.host) conf.session.host = server.hostname;
+
         var tmp = conf.session.expired.split('*');
         conf.session.expired = 1;
         for (var i = 0; i < tmp.length; i++)
@@ -46,8 +48,6 @@ exports.start = function (server, callback) {
 }
 
 var checkUUID = function (server) {
-    var hostHome = exports.session_path;
-
     var sessionInfo = {};
     var preUUID = server.cookies.uuid;
     if (preUUID != null && require('fs').existsSync(exports.session_path + '/' + preUUID + '.json')) {
@@ -70,12 +70,15 @@ var checkUUID = function (server) {
     while (require('fs').existsSync(exports.session_path + '/' + uuid + '.json') == true)
         uuid = require('node-uuid').v4();
     sessionInfo.uuid = uuid;
-    sessionInfo.host = server.hostname;
+    sessionInfo.host = server.vhost.middleware.session.host;
     sessionInfo.port = server.port;
     sessionInfo.date = new Date().toString();
+    sessionInfo.expired = server.vhost.middleware.session.expired;
     sessionInfo.storage = {};
 
+    console.log(sessionInfo.host);
+
     require('fs').writeFileSync(exports.session_path + '/' + uuid + '.json', JSON.stringify(sessionInfo));
-    server.response.setHeader("Set-Cookie", ['uuid=' + uuid + '; Domain=' + server.hostname + '; Path=/']);
+    server.response.setHeader("Set-Cookie", ['uuid=' + uuid + '; Domain=' + sessionInfo.host + '; Path=/']);
     return sessionInfo;
 }

@@ -37,7 +37,8 @@ orbis.vhost({
     },
     middleware: {
         session: {
-            expired: '1w'
+            expired: '1w',
+            host: '.local.com'
         }
     }
 });
