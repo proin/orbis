@@ -3,24 +3,35 @@
  */
 exports.start = function () {
     var vhost = __vhost;
+
+    for (var port in vhost) {
+        start(port);
+    }
+}
+
+function start(port) {
+    var vhost = __vhost;
     var ssl = __ssl;
-    for (port in vhost) {
-        if (ssl[port]) {
-            require('https').createServer({
-                key: require('fs').readFileSync(ssl[port].key, 'utf8'),
-                cert: require('fs').readFileSync(ssl[port].cert, 'utf8')
-            }, function (request, response) {
-                serverHandler(request, response, vhost[port], port);
-            }).listen(port, function () {
-                runningMsg(port);
-            });
-        } else {
-            require('http').createServer(function (request, response) {
-                serverHandler(request, response, vhost[port], port);
-            }).listen(port, function () {
-                runningMsg(port);
-            });
-        }
+
+    if (ssl[port]) {
+        var https = require('https').createServer({
+            key: require('fs').readFileSync(ssl[port].key, 'utf8'),
+            cert: require('fs').readFileSync(ssl[port].cert, 'utf8')
+        }, function (request, response) {
+            serverHandler(request, response, vhost[port], port);
+        });
+
+        https.listen(port, function () {
+            runningMsg(port);
+        });
+    } else {
+        var http = require('http').createServer(function (request, response) {
+            serverHandler(request, response, vhost[port], port);
+        });
+
+        http.listen(port, function () {
+            runningMsg(port);
+        })
     }
 }
 
@@ -45,5 +56,5 @@ function serverHandler(request, response, vhost, port) {
 // Server Running Message
 function runningMsg(port) {
     var date = new Date();
-    console.log('# Server Running : ' + date);
+    console.log('# Server Running : ' + port + ' (' + date + ')');
 }
