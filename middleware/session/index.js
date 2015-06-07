@@ -76,8 +76,6 @@ var checkUUID = function (server) {
     sessionInfo.expired = server.vhost.middleware.session.expired;
     sessionInfo.storage = {};
 
-    console.log(sessionInfo.host);
-
     require('fs').writeFileSync(exports.session_path + '/' + uuid + '.json', JSON.stringify(sessionInfo));
     server.response.setHeader("Set-Cookie", ['uuid=' + uuid + '; Domain=' + sessionInfo.host + '; Path=/']);
     return sessionInfo;

@@ -41,24 +41,18 @@ exports.start = function (server, callback) {
         queryOption = true;
 
     if (queryOption == false) {
-        server.result.code = 403;
-        server.result.type = 'text/html';
-        server.result.src = 'This API Allows Only ' + apiModule.method + ' Method.';
-        callback(server);
+        callback({code: 403, type: 'text/html', src: 'This API Allows Only ' + apiModule.method + ' Method.', finalize: true});
         return;
     }
 
     if (paramsRequirement == false) {
-        server.result.code = 400;
-        server.result.type = 'text/html';
-        server.result.src = 'Not Enough Query.';
-        callback(server);
+        callback({code: 400, type: 'text/html', src: 'Not Enough Query.', finalize: true});
         return;
     }
 
     database.connect(apiModule.db, function (err, db) {
         if (err) {
-            callback({code: 500, type: 'text/html', src: JSON.stringify(err)});
+            callback({code: 500, type: 'text/html', src: JSON.stringify(err), finalize: true});
             return;
         }
 
@@ -69,7 +63,12 @@ exports.start = function (server, callback) {
         };
 
         apiModule.result(_s, function (result) {
-            callback({type: result.type, src: result.result});
+            if (!result)
+                callback({code: 500, type: 'text/html', src: 'Internal Server Error (API)', finalize: true});
+            else if (!result.result)
+                callback({code: 500, type: 'text/html', src: 'Internal Server Error (API)', finalize: true});
+            else
+                callback({code: 200, type: result.type, src: result.result, finalize: true});
             try {
                 if (db != null) database.close(apiModule.db, db);
             } catch (e) {

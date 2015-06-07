@@ -56,6 +56,13 @@ exports.result = function (server, callback) {
     // same use of node.js 'mysql' or 'mongodb' module.
     var db = server.db;
     db.query('select * from table;', function (err, row) {
+        if (err) {
+            callback({
+                type: 'text/html; charset=utf-8',
+                result: JSON.stringify(err)
+            });
+            return;
+        }
 
         // return result using callback.
         callback({
