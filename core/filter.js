@@ -1,8 +1,4 @@
-exports.start = function (server) {
-    this.fn(server, this.end);
-};
-
-exports.fn = function (server, callback) {
+exports.start = function (server, callback) {
     var filters = [];
     var f = server.filter;
     delete server.filter;
@@ -20,7 +16,7 @@ exports.fn = function (server, callback) {
 
         executes++;
         if (executes == filters.length) {
-            callback(server);
+            callback();
         } else if (filters[executes].start) {
             filters[executes].start(server, cb);
         } else {
@@ -29,8 +25,4 @@ exports.fn = function (server, callback) {
     };
 
     cb();
-};
-
-exports.end = function (server) {
-    require('./finalize.js').start(server);
 };

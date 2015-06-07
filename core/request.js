@@ -1,8 +1,4 @@
-exports.start = function (server) {
-    this.fn(server, this.end);
-};
-
-exports.fn = function (server, callback) {
+exports.start = function (server, callback) {
     var request = server.request;
     // Extract Cookies
     server.cookies = {};
@@ -20,7 +16,7 @@ exports.fn = function (server, callback) {
     // Extract Request Queries
     if (request.method == 'GET') {
         server.query = require('url').parse(request.url, true).query;
-        callback(server);
+        callback();
     } else if (request.method == 'POST') {
         var body = '';
         request.on('data', function (data) {
@@ -29,11 +25,7 @@ exports.fn = function (server, callback) {
         request.on('end', function () {
             body = decodeURI(body);
             server.query = require('querystring').parse(body);
-            callback(server);
+            callback();
         });
     }
 };
-
-exports.end = function (server) {
-    require('./middleware.js').start(server);
-}

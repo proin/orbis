@@ -1,8 +1,4 @@
-exports.start = function (server) {
-    exports.fn(server, this.end);
-};
-
-exports.fn = function (server, callback) {
+exports.start = function (server, callback) {
     server.middleware = {};
     var middlewares = [];
     for (var n in __middlewares)
@@ -15,7 +11,7 @@ exports.fn = function (server, callback) {
             server.middleware[middlewares[executes].name] = _s;
         executes++;
         if (executes == middlewares.length) {
-            callback(server);
+            callback();
         } else if (middlewares[executes].fn.start) {
             middlewares[executes].fn.start(server, cb);
         } else {
@@ -23,8 +19,4 @@ exports.fn = function (server, callback) {
         }
     };
     cb();
-};
-
-exports.end = function (server) {
-    require('./filter.js').start(server);
 };

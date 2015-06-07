@@ -1,4 +1,4 @@
-exports.start = function (server) {
+exports.start = function (server, callback) {
     if (server.result.code == 200 && server.result.src) {
         // if result is already exists by middleware or filter
         server.response.writeHead(server.result.code, {'Content-Type': server.result.type});
@@ -21,9 +21,10 @@ exports.start = function (server) {
         server.response.on('drain', function () {
             readStream.resume();
         });
-
     } else {
         // no file or something trouble in server
         require('./error.js').print(server);
     }
+
+    callback();
 };

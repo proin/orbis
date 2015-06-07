@@ -69,5 +69,22 @@ exports.connect = function (server) {
         }
     }
 
-    require('./request.js').start(server);
+    var logics = [
+        require('./request.js'),
+        require('./middleware.js'),
+        require('./filter.js'),
+        require('./finalize.js')
+    ];
+
+    var executes = -1;
+    var cb = function () {
+        executes++;
+        if (executes == logics.length) {
+        } else if (logics[executes].start) {
+            logics[executes].start(server, cb);
+        } else {
+            cb();
+        }
+    };
+    cb();
 };
