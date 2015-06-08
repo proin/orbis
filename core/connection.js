@@ -20,8 +20,8 @@ exports.connect = function (server) {
     // Extract Request Info.
     var request = server.request;
     server.host = request.headers.host.replace(':' + server.port, '');
-    server.hostname = request.headers.host.replace(':' + server.port, '');
     if (!server.vhost[server.host]) server.host = '0.0.0.0';
+    server.hostname = request.headers.host.replace(':' + server.port, '');
 
     server.lang = request.headers["accept-language"];
     server.method = request.method;
@@ -48,7 +48,9 @@ exports.connect = function (server) {
         server.result.type = require('mime').lookup(server.web_file);
     }
 
-    if (server.result.type == 'application/octet-stream') {
+    if (require('fs').lstatSync(server.web_file).isDirectory()) {
+        server.result.code = 404;
+
         for (var i = 0; i < server.web_doc_index.length; i++) {
             var fpath = server.web_file + '/' + server.web_doc_index[i];
             if (require('fs').existsSync(fpath) == true) {
@@ -61,11 +63,20 @@ exports.connect = function (server) {
                 }
 
                 server.web_file = fpath;
+                server.path += '/' + server.web_doc_index[i];
+
                 server.result.code = 200;
                 server.result.type = require('mime').lookup(server.web_file);
                 delete server.result.src;
                 break;
             }
+        }
+
+        if (server.result.code == 404) {
+            server.result.type = 'text/html';
+            server.result.src = 'Not Found:<br>- The requested URL ' + server.path + ' was not found on this server.';
+            require('./error.js').print(server);
+            return;
         }
     }
 

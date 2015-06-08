@@ -5,12 +5,14 @@
  * @param callback
  */
 exports.start = function (server, callback) {
-    var apiExt = [];
-    for (var ext in server.vhost.filter) {
-        if (server.vhost.filter[ext] == 'api') {
-            apiExt.push(ext);
-        }
-    }
+    var apiExt = {startsWith: [], endsWith: []};
+    for (var ext in server.vhost.filter.endsWith)
+        if (server.vhost.filter.endsWith[ext] == 'api')
+            apiExt.endsWith.push(ext);
+
+    for (var ext in server.vhost.filter.startsWith)
+        if (server.vhost.filter.startsWith[ext] == 'api')
+            apiExt.startsWith.push(ext);
 
     var fs = require('fs');
     var explorer = function (dir, done) {
@@ -29,12 +31,18 @@ exports.start = function (server, callback) {
                             next();
                         });
                     } else {
-                        for (var i = 0; i < apiExt.length; i++) {
-                            if (file.endsWith(apiExt[i])) {
+                        for (var i = 0; i < apiExt.endsWith.length; i++)
+                            if (file.endsWith(apiExt.endsWith[i])) {
                                 results.push(file);
+                                next();
+                                return;
                             }
-                        }
-                        next();
+                        for (var i = 0; i < apiExt.startsWith.length; i++)
+                            if (file.startsWith(apiExt.startsWith[i])) {
+                                results.push(file);
+                                next();
+                                return;
+                            }
                     }
                 });
             })();

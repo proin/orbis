@@ -2,9 +2,15 @@ exports.start = function (server, callback) {
     var filters = [];
     var f = server.filter;
     delete server.filter;
-    for (var ext in f)
-        if (server.path.endsWith(ext) && __filters[f[ext]])
-            filters.push(__filters[f[ext]]);
+    if (f.endsWith)
+        for (var ext in f.endsWith)
+            if (server.path.endsWith(ext) && __filters[f.endsWith[ext]])
+                filters.push(__filters[f.endsWith[ext]]);
+
+    if (f.startsWith)
+        for (var ext in f.startsWith)
+            if (server.path.startsWith(ext) && __filters[f.startsWith[ext]])
+                filters.push(__filters[f.startsWith[ext]]);
 
     var executes = -1;
     var cb = function (_s) {

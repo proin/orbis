@@ -3,10 +3,12 @@ global.__vhost = {};
 global.__ssl = {};
 global.__filters = {
     api: require(__home + '/filter/api'),
-    apidoc: require(__home + '/filter/apidoc')
+    apidoc: require(__home + '/filter/apidoc'),
+    php: require(__home + '/filter/php')
 };
 global.__middlewares = {
-    session: require(__home + '/middleware/session')
+    session: require(__home + '/middleware/session'),
+    php: require(__home + '/middleware/php')
 };
 
 /**

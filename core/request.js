@@ -12,10 +12,15 @@ exports.start = function (server, callback) {
     }
 
     server.vhost = server.vhost[server.host];
+    server.querystring = '';
 
     // Extract Request Queries
     if (request.method == 'GET') {
         server.query = require('url').parse(request.url, true).query;
+        for (var key in server.query)
+            server.querystring += key + '=' + server.query[key] + '&';
+        if (server.querystring.endsWith('&'))
+            server.querystring = server.querystring.substring(0, server.querystring.length - 1);
         callback();
     } else if (request.method == 'POST') {
         var body = '';
