@@ -22,10 +22,8 @@ exports.start = function (server, callback) {
     }
 
     var cookies = server.cookies;
-    var hostname = server.host;
     var uuid = cookies.uuid;
-    var session = checkUUID(server, hostname, uuid);
-
+    var session = checkUUID(server);
     var sessionFilePath = exports.session_path + '/' + uuid + ".json";
     session.edit = function (key, val) {
         session.storage[key] = val;
@@ -48,21 +46,26 @@ exports.start = function (server, callback) {
 }
 
 var checkUUID = function (server) {
-    var sessionInfo = {};
+    var sessionInfo = {}
+    var sessionhost = '';
+    if (server.vhost.middleware.session.host) sessionhost = server.vhost.middleware.session.host;
+    else sessionhost = server.hostname;
+
     var preUUID = server.cookies.uuid;
     if (preUUID != null && require('fs').existsSync(exports.session_path + '/' + preUUID + '.json')) {
         sessionInfo = JSON.parse(require('fs').readFileSync(exports.session_path + '/' + preUUID + '.json'));
+        if (sessionInfo.host == sessionhost) {
+            var sessionDate = new Date(sessionInfo.date);
+            var now = new Date();
+            var diff = now - sessionDate;
 
-        var sessionDate = new Date(sessionInfo.date);
-        var now = new Date();
-        var diff = now - sessionDate;
-
-        if (diff < server.vhost.middleware.session.expired) {
-            sessionInfo.date = new Date().toString();
-            require('fs').writeFileSync(exports.session_path + '/' + preUUID + '.json', JSON.stringify(sessionInfo));
-            return JSON.parse(require('fs').readFileSync(exports.session_path + '/' + preUUID + '.json'));
-        } else {
-            require('fs').unlinkSync(exports.session_path + '/' + preUUID + '.json', JSON.stringify(sessionInfo));
+            if (diff < server.vhost.middleware.session.expired) {
+                sessionInfo.date = new Date().toString();
+                require('fs').writeFileSync(exports.session_path + '/' + preUUID + '.json', JSON.stringify(sessionInfo));
+                return JSON.parse(require('fs').readFileSync(exports.session_path + '/' + preUUID + '.json'));
+            } else {
+                require('fs').unlinkSync(exports.session_path + '/' + preUUID + '.json', JSON.stringify(sessionInfo));
+            }
         }
     }
 
@@ -70,7 +73,7 @@ var checkUUID = function (server) {
     while (require('fs').existsSync(exports.session_path + '/' + uuid + '.json') == true)
         uuid = require('node-uuid').v4();
     sessionInfo.uuid = uuid;
-    sessionInfo.host = server.vhost.middleware.session.host;
+    sessionInfo.host = sessionhost;
     sessionInfo.port = server.port;
     sessionInfo.date = new Date().toString();
     sessionInfo.expired = server.vhost.middleware.session.expired;

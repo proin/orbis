@@ -3,17 +3,20 @@
  * this is not completed.
  * be careful to use.
  *
+ * TODO refer http://graphcomp.com/info/specs/cgi11.html & fix to available post
+ *
  * @param server
  * @param callback
  */
+
+exports.bin = 'php-cgi';
+
 exports.start = function (server, callback) {
     require('dns').lookup(require('os').hostname(), function (err, add, fam) {
         server.address = add;
         fn(server, callback);
     });
 }
-
-exports.bin = 'php-cgi';
 
 var fn = function (server, callback) {
     var bin = exports.bin;
@@ -93,8 +96,6 @@ var fn = function (server, callback) {
                 server.response.end();
                 return;
             }
-
-
 
             cb(result);
         });

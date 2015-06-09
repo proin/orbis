@@ -48,7 +48,7 @@ exports.connect = function (server) {
         server.result.type = require('mime').lookup(server.web_file);
     }
 
-    if (require('fs').lstatSync(server.web_file).isDirectory()) {
+    if (server.result.code == 200 && require('fs').lstatSync(server.web_file).isDirectory()) {
         server.result.code = 404;
 
         for (var i = 0; i < server.web_doc_index.length; i++) {
