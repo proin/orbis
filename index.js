@@ -1,3 +1,4 @@
+global.__version = '0.2.1';
 global.__home = __dirname;
 global.__vhost = {};
 global.__ssl = {};

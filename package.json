@@ -1,16 +1,31 @@
 {
-  "name": "orbis",
-  "description": "Node.js Web Engine",
-  "author": {
-    "name": "Chae Yeonghun",
-    "email": "proin@proinlab.com"
-  },
-  "version": "0.1.10",
-  "private": true,
-  "dependencies": {
-    "mime": ">= 1.2.11",
-    "mongodb": ">= 1.4.12",
-    "mysql": ">= 2.5.2",
-    "node-uuid": ">= 1.4.1"
-  }
+    "name": "orbis",
+    "description": "Node.js Web Engine",
+    "author": {
+        "name": "Chae Yeonghun",
+        "email": "proin@proinlab.com"
+    },
+    "version": "0.2.1",
+    "private": true,
+    "dependencies": {
+        "mime": ">= 1.2.11",
+        "mongodb": ">= 1.4.12",
+        "mysql": ">= 2.5.2",
+        "node-uuid": ">= 1.4.1"
+    },
+    "files": [
+        "LICENSE",
+        "README.md",
+        "index.js",
+        "example.js",
+        "core/",
+        "filter/",
+        "middleware/",
+        "ssl/",
+        "www/",
+        "example/"
+    ],
+    "scripts": {
+        "test": "sudo node example.js"
+    }
 }
