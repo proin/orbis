@@ -2,15 +2,21 @@ exports.start = function (server, callback) {
     var filters = [];
     var f = server.filter;
     delete server.filter;
-    if (f.endsWith)
-        for (var ext in f.endsWith)
-            if (server.path.endsWith(ext) && __filters[f.endsWith[ext]])
-                filters.push(__filters[f.endsWith[ext]]);
 
-    if (f.startsWith)
-        for (var ext in f.startsWith)
-            if (server.path.startsWith(ext) && __filters[f.startsWith[ext]])
-                filters.push(__filters[f.startsWith[ext]]);
+    for (var m in f) {
+        var exp = f[m];
+        if (exp.length) {
+            for (var i = 0; i < exp.length; i++) {
+                if (server.path.match(exp[i])) {
+                    filters.push(__filters[m]);
+                    break;
+                }
+            }
+        } else {
+            if (server.path.match(exp))
+                filters.push(__filters[m]);
+        }
+    }
 
     var executes = -1;
     var cb = function (_s) {

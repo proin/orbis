@@ -13,15 +13,18 @@ orbis.vhost({
     port: '80', // port
     dir: '$home/www', // $home replace with root directory of orbis installed. or you must use absolute path.
     index: ['index.html', 'index.htm'],
+    // filter: {
+    //     "filter-name": js-regular-expression  or [ js-regular-expression ]
+    // }
     filter: {
-        startsWith: {
-            '/doc': 'apidoc'
-        },
-        endsWith: {
-            '.api.js': 'api', // set suffix of path name and filter name that you want to mapping.
-            '.api': 'api',
-            '.php': 'php'
-        }
+        api: [
+            /.api.js$/gim,
+            /.api$/gim
+        ],
+        apidoc: [
+            /^\/docs/gim
+        ],
+        php: /.php$/gim
     },
     middleware: {
         session: {
@@ -36,14 +39,16 @@ orbis.vhost({
     dir: '$home/www', // $home replace with root directory of orbis installed. or you must use absolute path.
     index: ['index.php', 'index.html'],
     filter: {
-        startsWith: {
-            '/doc': 'apidoc'
-        },
-        endsWith: {
-            '.api.js': 'api', // set suffix of path name and filter name that you want to mapping.
-            '.api': 'api',
-            '.php': 'php'
-        }
+        api: [
+            /.api.js$/gim,
+            /.api$/gim
+        ],
+        apidoc: [
+            /^\/docs/gim
+        ],
+        php: [
+            /.php$/gim
+        ]
     },
     middleware: {
         session: {
