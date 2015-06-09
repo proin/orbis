@@ -9,7 +9,8 @@ global.__filters = {
 };
 global.__middlewares = {
     session: require(__home + '/middleware/session'),
-    php: require(__home + '/middleware/php')
+    php: require(__home + '/middleware/php'),
+    database: require(__home + '/middleware/database')
 };
 
 /**

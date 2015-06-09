@@ -1,11 +1,16 @@
 /**
  * control databases.
- * now support mongodb and mysql.
- *
- * @param config
- * @param callback
+ * supports:
+ *      mongodb and mysql.
  */
-exports.connect = function (config, callback) {
+exports.start = function (server, callback) {
+    var db = {};
+    db.connect = connect;
+    db.close = connect;
+    callback(db);
+};
+
+var connect = function (config, callback) {
     if (config == null || config.type == null) {
         callback(true, null);
         return;
@@ -32,9 +37,9 @@ exports.connect = function (config, callback) {
             });
             break;
     }
-}
+};
 
-exports.close = function (config, db) {
+var close = function (config, db) {
     switch (config.type) {
         case 'mongodb' :
             db.close();
@@ -43,4 +48,4 @@ exports.close = function (config, db) {
             db.end();
             break;
     }
-}
+};

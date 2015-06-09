@@ -10,7 +10,7 @@ exports.start = function (server, callback) {
         return;
     }
 
-    var database = require(__dirname + '/modules/database.js')
+    var database = server.middleware.database;
 
     delete require.cache[server.web_file];
     var apiModule = require(server.web_file);
@@ -63,16 +63,16 @@ exports.start = function (server, callback) {
         };
 
         apiModule.result(_s, function (result) {
+            try {
+                if (db != null) database.close(apiModule.db, db);
+            } catch (e) {
+            }
             if (!result)
                 callback({code: 500, type: 'text/html', src: 'Internal Server Error (API)', finalize: true});
             else if (!result.result)
                 callback({code: 500, type: 'text/html', src: 'Internal Server Error (API)', finalize: true});
             else
                 callback({code: 200, type: result.type, src: result.result, finalize: true});
-            try {
-                if (db != null) database.close(apiModule.db, db);
-            } catch (e) {
-            }
         });
     });
 }
