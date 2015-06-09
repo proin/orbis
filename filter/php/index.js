@@ -1,3 +1,11 @@
+/**
+ * php filter.
+ * this is not completed.
+ * be careful to use.
+ *
+ * @param server
+ * @param callback
+ */
 exports.start = function (server, callback) {
     if (server.result.code == 404) {
         callback();

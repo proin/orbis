@@ -14,7 +14,7 @@ orbis.vhost({
     dir: '$home/www', // $home replace with root directory of orbis installed. or you must use absolute path.
     index: ['index.html', 'index.htm'],
     // filter: {
-    //     "filter-name": js-regular-expression  or [ js-regular-expression ]
+    //     "filter-name": js-regular-expression or [ js-regular-expression ]
     // }
     filter: {
         api: [

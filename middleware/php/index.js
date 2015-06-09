@@ -1,3 +1,11 @@
+/**
+ * php middleware.
+ * this is not completed.
+ * be careful to use.
+ *
+ * @param server
+ * @param callback
+ */
 exports.start = function (server, callback) {
     require('dns').lookup(require('os').hostname(), function (err, add, fam) {
         server.address = add;
