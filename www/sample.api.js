@@ -50,8 +50,8 @@ exports.result = function (server, callback) {
     // this is session middleware. you can use very easily likes below.
     var session = server.middleware.session;
     session.get('key');
-    session.edit('key', 'value');
-    session.remove('key');
+    session.set('key', 'value');
+    session.del('key');
 
     // same use of node.js 'mysql' or 'mongodb' module.
     var db = server.db;

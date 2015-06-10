@@ -7,6 +7,12 @@ orbis.filter('sample-filter', require('./example/filter/sample-filter'));
 // additional middleware
 orbis.middleware('sample-middleware', require('./example/middleware/sample-middleware'));
 
+// to use redis for session saving @ session middleware
+// install redis in your system before set this option
+// refer to http://redis.io/download
+// by default, this option is false. (use file system for session saving)
+orbis.middleware('session').redis = true;
+
 // set virtual hosts
 orbis.vhost({
     host: 'orbis.local.com', // host like this

@@ -1,4 +1,4 @@
-global.__version = '0.2.1';
+global.__version = '0.2.2';
 global.__home = __dirname;
 global.__vhost = {};
 global.__ssl = {};
@@ -39,6 +39,12 @@ exports.ssl = function (port, key, cert) {
  * @param module: middleware module
  */
 exports.middleware = function (name, module) {
+    if (!module) {
+        if (__middlewares[name])
+            return __middlewares[name];
+        return;
+    }
+
     if (!module.start) return;
     __middlewares[name] = module;
 };
