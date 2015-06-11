@@ -69,8 +69,16 @@ var fn = function (server, callback) {
 
         server.request.pipe(cgi.stdin);
 
+        var result = '';
         cgi.stdout.on('data', function (data) {
-            var result = data + '';
+            result += data + '';
+        });
+
+        cgi.stderr.on('data', function (data) {
+            result = data + '';
+        });
+
+        cgi.on('close', function (code) {
             var headers = result.substring(0, result.indexOf('\r\n\r\n')).replace(/\r/gi, '').split('\n');
             result = result.substring(result.indexOf('\r\n\r\n') + '\r\n\r\n'.length);
             var h = {};
@@ -98,13 +106,6 @@ var fn = function (server, callback) {
             }
 
             cb(result);
-        });
-
-        cgi.stderr.on('data', function (data) {
-            cb(data + '');
-        });
-
-        cgi.on('close', function (code) {
         });
     };
 

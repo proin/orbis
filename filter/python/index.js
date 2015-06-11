@@ -13,15 +13,17 @@ exports.start = function (server, callback) {
     }
     var python = spawn('python', params);
 
+
+    var res = '';
     python.stdout.on('data', function (data) {
-        var result = data + '';
-        callback({code: 200, type: 'text/html', src: result, finalize: true});
+        res += data + '';
     });
 
     python.stderr.on('data', function (data) {
-        callback({code: 200, type: 'text/html', src: data + '', finalize: true});
+        res = data + '';
     });
 
     python.on('close', function (code) {
+        callback({code: 200, type: 'text/html', src: res, finalize: true});
     });
 };
