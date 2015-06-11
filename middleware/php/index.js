@@ -101,6 +101,7 @@ var fn = function (server, callback) {
         });
 
         cgi.stderr.on('data', function (data) {
+            cb(data + '');
         });
 
         cgi.on('close', function (code) {

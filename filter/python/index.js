@@ -6,7 +6,11 @@ exports.start = function (server, callback) {
 
     var spawn = require('child_process').spawn;
     var params = [server.web_file];
-    if (server.query['argv']) params.push(server.query['argv']);
+    if (server.query['argv']) {
+        var argvs = server.query['argv'].split(' ');
+        for (var i = 0; i < argvs.length; i++)
+            params.push(argvs[i]);
+    }
     var python = spawn('python', params);
 
     python.stdout.on('data', function (data) {
@@ -15,6 +19,7 @@ exports.start = function (server, callback) {
     });
 
     python.stderr.on('data', function (data) {
+        callback({code: 200, type: 'text/html', src: data + '', finalize: true});
     });
 
     python.on('close', function (code) {

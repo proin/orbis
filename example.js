@@ -15,7 +15,7 @@ orbis.middleware('session').redis = true;
 
 // set virtual hosts
 orbis.vhost({
-    host: 'orbis.local.com', // host like this
+    host: '127.0.0.1', // allowed host
     port: '80', // port
     dir: '$home/www', // $home replace with root directory of orbis installed. or you must use absolute path.
     index: ['index.html', 'index.htm'],
@@ -41,7 +41,7 @@ orbis.vhost({
 });
 
 orbis.vhost({
-    host: 'orbis.local.com', // host like this
+    host: '127.0.0.1', // allowed host
     port: 'https', // 'https' and 'http' replace with '443' and '80'
     dir: '$home/www', // $home replace with root directory of orbis installed. or you must use absolute path.
     index: ['index.php', 'index.html'],
