@@ -1,11 +1,12 @@
-global.__version = '0.2.2';
+global.__version = '0.2.3';
 global.__home = __dirname;
 global.__vhost = {};
 global.__ssl = {};
 global.__filters = {
     api: require(__home + '/filter/api'),
     apidoc: require(__home + '/filter/apidoc'),
-    php: require(__home + '/filter/php')
+    php: require(__home + '/filter/php'),
+    python: require(__home + '/filter/python')
 };
 global.__middlewares = {
     session: require(__home + '/middleware/session'),

@@ -30,7 +30,8 @@ orbis.vhost({
         apidoc: [
             /^\/docs/gim
         ],
-        php: /.php$/gim
+        php: /.php$/gim,
+        python: /.py$/gim
     },
     middleware: {
         session: {

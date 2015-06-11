@@ -2,10 +2,10 @@
     "name": "orbis",
     "description": "Node.js Web Engine",
     "author": {
-        "name": "Chae Yeonghun",
+        "name": "Yeonghun, Chae",
         "email": "proin@proinlab.com"
     },
-    "version": "0.2.2",
+    "version": "0.2.3",
     "private": true,
     "dependencies": {
         "mime": ">= 1.2.11",
