@@ -45,19 +45,18 @@ exports.method = 'GET/POST/AUTO';
  * @param server
  * @param callback
  */
-exports.result = function (server, callback) {
+exports.result = function ($query, $db, $middleware, $response) {
 
     // this is session middleware. you can use very easily likes below.
-    var session = server.middleware.session;
+    var session = $middleware.session;
     session.get('key');
     session.set('key', 'value');
     session.del('key');
 
     // same use of node.js 'mysql' or 'mongodb' module.
-    var db = server.db;
-    db.query('select * from table;', function (err, row) {
+    $db.query('select * from table;', function (err, row) {
         if (err) {
-            callback({
+            $response({
                 type: 'text/html; charset=utf-8',
                 result: JSON.stringify(err)
             });
@@ -65,7 +64,7 @@ exports.result = function (server, callback) {
         }
 
         // return result using callback.
-        callback({
+        $response({
             type: 'text/html; charset=utf-8',
             result: JSON.stringify(row)
         });

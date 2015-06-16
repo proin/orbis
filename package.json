@@ -5,8 +5,7 @@
         "name": "Yeonghun, Chae",
         "email": "proin@proinlab.com"
     },
-    "version": "0.2.3",
-    "private": true,
+    "version": "0.2.4",
     "dependencies": {
         "mime": ">= 1.2.11",
         "mongodb": ">= 1.4.12",

@@ -1,4 +1,6 @@
-global.__version = '0.2.3';
+require('./libs/prototypes');
+
+global.__version = '0.2.4';
 global.__home = __dirname;
 global.__vhost = {};
 global.__ssl = {};
@@ -122,12 +124,4 @@ exports.vhost = function (conf) {
 exports.start = function () {
     var orbis = require('./core/core.js');
     orbis.start();
-};
-
-String.prototype.startsWith = function (suffix) {
-    return !(this.indexOf(suffix) !== 0);
-};
-
-String.prototype.endsWith = function (suffix) {
-    return this.indexOf(suffix, this.length - suffix.length) !== -1;
 };

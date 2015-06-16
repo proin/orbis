@@ -15,14 +15,13 @@ exports.doc = {
 
 exports.method = 'GET';
 
-exports.result = function (server, callback) {
-    var query = server.query;
-    var session = server.middleware.session;
+exports.result = function ($query, $middleware, $response) {
+    var session = $middleware.session;
 
-    session.set('q', query.q);
+    session.set('q', $query.q);
 
-    callback({
+    $response({
         type: 'text/html; charset=utf-8',
         result: JSON.stringify(session.get('q'))
     });
-}
+};

@@ -58,37 +58,59 @@ exports.start = function (server, callback) {
             }
 
             var _s = {
-                query: server.query,
-                db: db,
-                middleware: server.middleware
+                $query: server.query,
+                $database: db,
+                $middleware: server.middleware,
+                $response: function (result) {
+                    try {
+                        if (db != null) database.close(apiModule.db, db);
+                    } catch (e) {
+                    }
+                    if (!result)
+                        callback({code: 500, type: 'text/html', src: 'Internal Server Error (API)', finalize: true});
+                    else if (!result.result)
+                        callback({code: 500, type: 'text/html', src: 'Internal Server Error (API)', finalize: true});
+                    else
+                        callback({code: 200, type: result.type, src: result.result, finalize: true});
+                }
             };
 
-            apiModule.result(_s, function (result) {
-                try {
-                    if (db != null) database.close(apiModule.db, db);
-                } catch (e) {
-                }
+            apiModule.result.map(_s)();
+            //apiModule.result(_s, function (result) {
+            //    try {
+            //        if (db != null) database.close(apiModule.db, db);
+            //    } catch (e) {
+            //    }
+            //    if (!result)
+            //        callback({code: 500, type: 'text/html', src: 'Internal Server Error (API)', finalize: true});
+            //    else if (!result.result)
+            //        callback({code: 500, type: 'text/html', src: 'Internal Server Error (API)', finalize: true});
+            //    else
+            //        callback({code: 200, type: result.type, src: result.result, finalize: true});
+            //});
+        });
+    } else {
+        var _s = {
+            $query: server.query,
+            $middleware: server.middleware,
+            $response: function (result) {
                 if (!result)
                     callback({code: 500, type: 'text/html', src: 'Internal Server Error (API)', finalize: true});
                 else if (!result.result)
                     callback({code: 500, type: 'text/html', src: 'Internal Server Error (API)', finalize: true});
                 else
                     callback({code: 200, type: result.type, src: result.result, finalize: true});
-            });
-        });
-    } else {
-        var _s = {
-            query: server.query,
-            middleware: server.middleware
+            }
         };
 
-        apiModule.result(_s, function (result) {
-            if (!result)
-                callback({code: 500, type: 'text/html', src: 'Internal Server Error (API)', finalize: true});
-            else if (!result.result)
-                callback({code: 500, type: 'text/html', src: 'Internal Server Error (API)', finalize: true});
-            else
-                callback({code: 200, type: result.type, src: result.result, finalize: true});
-        });
+        apiModule.result.map(_s)();
+        //apiModule.result(_s, function (result) {
+        //    if (!result)
+        //        callback({code: 500, type: 'text/html', src: 'Internal Server Error (API)', finalize: true});
+        //    else if (!result.result)
+        //        callback({code: 500, type: 'text/html', src: 'Internal Server Error (API)', finalize: true});
+        //    else
+        //        callback({code: 200, type: result.type, src: result.result, finalize: true});
+        //});
     }
 }
