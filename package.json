@@ -1,11 +1,21 @@
 {
     "name": "orbis",
+    "version": "0.2.4",
     "description": "Node.js Web Engine",
     "author": {
         "name": "Yeonghun, Chae",
         "email": "proin@proinlab.com"
     },
-    "version": "0.2.4",
+    "contributors": [
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/orbislab/orbis.git"
+    },
+    "bugs": {
+        "url": "https://github.com/orbislab/orbis/issues"
+    },
+    "main": "./",
     "dependencies": {
         "mime": ">= 1.2.11",
         "mongodb": ">= 1.4.12",
@@ -28,5 +38,19 @@
     ],
     "scripts": {
         "test": "sudo node example.js"
-    }
+    },
+    "engines": {
+        "node": ">= 0.4.0"
+    },
+    "licenses": [
+        {
+            "type": "MIT",
+            "url": "http://www.opensource.org/licenses/MIT"
+        }
+    ],
+    "keywords": [
+        "web server",
+        "RESTful API",
+        "API Server"
+    ]
 }
