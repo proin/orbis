@@ -1,6 +1,6 @@
 {
     "name": "orbis",
-    "version": "0.2.5",
+    "version": "0.2.7",
     "description": "Node.js Web Engine",
     "author": {
         "name": "Yeonghun, Chae",
@@ -22,7 +22,8 @@
         "mysql": ">= 2.5.2",
         "node-uuid": ">= 1.4.1",
         "redis": ">= 0.12.1",
-        "hiredis": ">= 0.4.0"
+        "hiredis": ">= 0.4.0",
+        "cli-color" : ">= 1.0.0"
     },
     "files": [
         "LICENSE",

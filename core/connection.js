@@ -17,8 +17,11 @@ exports.connect = function (server) {
         if (server.response) require('./error.js').print(server);
     });
 
+    var reqStart = new Date().getTime();
+
     // Extract Request Info.
     var request = server.request;
+
     server.host = request.headers.host.replace(':' + server.port, '');
     if (!server.vhost[server.host]) server.host = '0.0.0.0';
     server.hostname = request.headers.host.replace(':' + server.port, '');
@@ -91,6 +94,14 @@ exports.connect = function (server) {
     var cb = function () {
         executes++;
         if (executes == logics.length) {
+            var clc = require('cli-color');
+            var t = new Date().getTime() - reqStart;
+            var code = server.result.code;
+            if (code / 100 == 2) code = clc.blue(code);
+            else if (code / 100 == 3) code = clc.yellow(code);
+            else code = clc.red(code);
+
+            console.log(request.method, code, t + 'ms', clc.green('PATH=') + require('url').parse(request.url).pathname);
         } else if (logics[executes].start) {
             logics[executes].start(server, cb);
         } else {

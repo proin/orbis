@@ -1,6 +1,6 @@
 require('./core/prototypes.js');
 
-global.__version = '0.2.5';
+global.__version = '0.2.7';
 global.__home = __dirname;
 global.__vhost = {};
 global.__ssl = {};
